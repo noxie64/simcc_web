@@ -1,2 +1,10 @@
 @import "tailwindcss";
-@plugin "daisyui";
+
+@plugin "daisyui" {
+    themes: light --default;
+}
+
+@theme {
+  --color-primary: var(--color-violet-700);
+  --color-outline: var(--color-gray-300);
+}
