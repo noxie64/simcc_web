@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @plugin "daisyui" {
-    themes: false;
+    themes: light --default;
 }
 
 @theme {
@@ -10,9 +10,8 @@
 }
 
 @plugin "daisyui/theme" {
-    name: "simcc";
+    name: "light";
     default: true;
-    extends: "light";
     --color-primary: var(--color-violet-700);
     --color-primary-content: #ffffff;
 }
