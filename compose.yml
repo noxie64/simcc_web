@@ -1,0 +1,58 @@
+name: simcc
+
+services:
+  app-dev:
+    depends_on:
+      - postgres
+      - pgadmin
+    build:
+      context: backend/
+      target: dev
+    env_file:
+      - "backend/.env"
+    ports:
+      - "8080:8080" # web
+      - "5005:5005" # debug
+    volumes:
+      - ./backend:/app # live source mount
+      - ~/.m2:/root/.m2
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    env_file:
+      - "backend/.env"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    env_file:
+      - "backend/.env"
+    volumes:
+      - pgadmin-store:/var/lib/pgadmin/
+    depends_on:
+      - postgres
+    configs:
+      - source: pgadmin-servers
+        target: /pgadmin4/servers.json
+        mode: 0444
+configs:
+  pgadmin-servers:
+    content: |
+      {
+        "Servers": {
+          "1": {
+            "Name": "simcc",
+            "Group": "Servers",
+            "Host": "postgres",
+            "Port": 5432,
+            "MaintenanceDB": "postgres",
+            "Username": "simcc"
+          }
+        }
+      }
+volumes:
+  postgres_data:
+  pgadmin-store:
