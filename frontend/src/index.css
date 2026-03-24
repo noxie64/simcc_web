@@ -1,10 +1,18 @@
 @import "tailwindcss";
 
 @plugin "daisyui" {
-    themes: light --default;
+    themes: false;
 }
 
 @theme {
-  --color-primary: var(--color-violet-700);
-  --color-outline: var(--color-gray-300);
+    --color-primary: var(--color-violet-700);
+    --color-outline: var(--color-gray-300);
+}
+
+@plugin "daisyui/theme" {
+    name: "simcc";
+    default: true;
+    extends: "light";
+    --color-primary: var(--color-violet-700);
+    --color-primary-content: #ffffff;
 }
