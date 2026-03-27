@@ -1,11 +1,15 @@
 package at.simcc.simcc_backend.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.boot.context.properties.bind.DefaultValue;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * Project: SimCC-Backend
@@ -13,16 +17,22 @@ import java.time.Instant;
  * Date: 3/27/26
  */
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class TrojanSession {
     @Id
     @GeneratedValue
-    private Integer trojanId;
+    private Long trojanId;
 
     @Column(nullable = false, unique = true)
     private String ccid;
 
-    @Column(nullable = false)
-    private Instant createdAt;
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
-
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
 }
