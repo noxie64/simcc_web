@@ -1,14 +1,14 @@
 package at.simcc.simcc_backend.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import at.simcc.simcc_backend.generator.CustomIdGenerator;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 /**
@@ -24,7 +24,13 @@ import java.time.LocalDate;
 @Builder
 @Table(name = "users")
 public class User {
+    /**
+     * @GenericGenerator -> is to specify an own IdGenerator and a name to it
+     */
+
     @Id
+    @GenericGenerator(name = "custom_generator", type = CustomIdGenerator.class)
+    @GeneratedValue(generator = "custom_generator")
     private Long userId;
     @Column(nullable = false, unique = true)
     private String username;
@@ -32,7 +38,14 @@ public class User {
     private String email;
     @Column(nullable = false)
     private String password;
-    @Column(nullable = false)
-    private LocalDate createdAt;
+    @Column(nullable = false, updatable = false)
+    private Instant createdAt;
     private String totpSecret;
+
+    /**
+     * Is made for checking, if the account is meant as admin or user
+     */
+
+    @Transient
+    private Boolean isAdmin;
 }
