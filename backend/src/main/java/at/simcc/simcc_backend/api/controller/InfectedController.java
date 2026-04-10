@@ -23,6 +23,11 @@ import org.springframework.web.bind.annotation.*;
 public class InfectedController {
     private final InfectedService infectedService;
 
+    /**
+     * Route to register a newly infected machine
+     * @param ccidReq {@link at.simcc.simcc_backend.api.body.CCIDRequest} containing a {@code ccid} to check
+     * @return 200 OK with the newly set {@code iid}
+     */
     @PostMapping("/reg")
     public ResponseEntity<?> registerInfected(@RequestBody CCIDRequest ccidReq) {
 
