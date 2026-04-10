@@ -28,9 +28,9 @@ public class InfectedDal {
     private final InfectedMapper infectedMapper;
 
     /**
-     * Register a new infected machine using a trojan-id
-     * @param ccid A Command and Control ID used to check wether a valid trojan session is used
-     * @throws EntityNotFoundException when the ccid was invalid
+     * Register a new infected machine using a {@code ccid}
+     * @param ccid a {@code ccid} used to check wether a valid trojan session is used
+     * @throws EntityNotFoundException when the {@code ccid} was invalid
      */
     public InfectedIdDto registerInfected(String ccid) {
         trojanSessionRepository.findTrojanSessionByCcid(ccid)
