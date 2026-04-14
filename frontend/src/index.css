@@ -5,6 +5,13 @@
 }
 
 @theme {
-  --color-primary: var(--color-violet-700);
-  --color-outline: var(--color-gray-300);
+    --color-primary: var(--color-violet-700);
+    --color-outline: var(--color-gray-300);
+}
+
+@plugin "daisyui/theme" {
+    name: "light";
+    default: true;
+    --color-primary: var(--color-violet-700);
+    --color-primary-content: #ffffff;
 }

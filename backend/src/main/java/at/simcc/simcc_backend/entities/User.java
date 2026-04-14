@@ -1,18 +1,14 @@
 package at.simcc.simcc_backend.entities;
 
+import at.simcc.simcc_backend.generator.CustomIdGenerator;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Project: simcc_web
@@ -27,8 +23,13 @@ import java.util.Set;
 @Builder
 @Table(name = "users")
 public class User {
+    /**
+     * @GenericGenerator -> is to specify an own IdGenerator and a name to it
+     */
+
     @Id
-    @GeneratedValue
+    @GenericGenerator(name = "custom_generator", type = CustomIdGenerator.class)
+    @GeneratedValue(generator = "custom_generator")
     private Long userId;
     @Column(nullable = false, unique = true)
     private String username;
@@ -41,6 +42,10 @@ public class User {
     private LocalDateTime createdAt;
     private String totpSecret;
 
-    @OneToMany(mappedBy = "createdBy", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-    private Set<TrojanSession> trojanSessions;
+    /**
+     * Is made for checking, if the account is meant as admin or user
+     */
+
+    @Transient
+    private Boolean isAdmin;
 }
