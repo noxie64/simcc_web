@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Date: 4/10/26
  */
 public interface InfectedRepository extends JpaRepository<Infected, Long> {
+    boolean existsInfectedByIid(Long iid);
 }
