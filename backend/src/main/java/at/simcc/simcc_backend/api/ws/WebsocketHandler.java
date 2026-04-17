@@ -1,21 +1,15 @@
 package at.simcc.simcc_backend.api.ws;
 
-import at.simcc.simcc_backend.api.ws.payload.AUTHPayload;
 import at.simcc.simcc_backend.api.ws.payload.ERRPayload;
 import at.simcc.simcc_backend.api.ws.payload.ErrType;
 import at.simcc.simcc_backend.repo.InfectedRepository;
-import at.simcc.simcc_backend.repo.TrojanSessionRepository;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
-import at.simcc.simcc_backend.api.ws.Message;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
@@ -47,29 +41,13 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
             Message msg = objectMapper.readValue(message.getPayload(), Message.class);
 
             switch (msg.getType()) {
-                case HELLO -> sendMessage(session, Message.builder().type(MessageType.GOODBEY).payload(
+                case HELLO -> sendMessage(session, Message.builder().type(MessageType.GOODBYE).payload(
                         "You said: %s, good bye!".formatted(msg.getPayload())
                 ).build());
-
-                case AUTH -> {
-                    AUTHPayload authPayload = (AUTHPayload) msg.getPayload();
-
-                    if (infectedRepository.existsInfectedByIid(authPayload.getToken())) {
-
-                    }
-
-                    sendError(
-                            session,
-                            ERRPayload.builder()
-                                    .type(ErrType.INV_AUTH)
-                                    .build()
-                    );
-                }
-
             }
 
             if (msg.getType() == MessageType.HELLO) {
-                sendMessage(session, Message.builder().type(MessageType.GOODBEY).payload(
+                sendMessage(session, Message.builder().type(MessageType.GOODBYE).payload(
                         "You said: %s, good bye!".formatted(msg.getPayload())
                 ).build());
             }

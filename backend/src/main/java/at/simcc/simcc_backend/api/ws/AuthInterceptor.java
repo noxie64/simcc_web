@@ -8,6 +8,7 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Project: SimCC-Backend
@@ -28,12 +29,12 @@ public class AuthInterceptor implements HandshakeInterceptor {
         if (request.getHeaders().containsHeader("Authorization")) {
             if (request.getHeaders().getFirst("Authorization").startsWith("IID ")) {
                 try {
-                    Long iid = Long.parseLong(request.getHeaders().getFirst("Authorization").split("IID ")[1]);
+                    UUID iid = UUID.fromString(request.getHeaders().getFirst("Authorization").split("IID ")[1]);
                     if (infectedRepository.existsInfectedByIid(iid)) {
                         attributes.put("authenticated", true);
                         return true;
                     }
-                } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+                } catch (ArrayIndexOutOfBoundsException | IllegalArgumentException e) {
                     return false;
                 }
             }

@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .cors(cors -> corsConfigurationSource())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/reg", "/api/users/check-if-exist").permitAll()
+                        .requestMatchers("/api/infected/reg").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> basic.disable())

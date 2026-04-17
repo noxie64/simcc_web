@@ -6,5 +6,5 @@ package at.simcc.simcc_backend.api.ws;
  * Date: 4/14/26
  */
 public enum MessageType {
-    GOODBEY, HELLO, ERR, AUTH
+    GOODBYE, HELLO, ERR
 }
