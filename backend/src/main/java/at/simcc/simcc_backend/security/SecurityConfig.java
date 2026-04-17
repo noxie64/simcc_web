@@ -1,5 +1,6 @@
 package at.simcc.simcc_backend.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,6 +25,9 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Value("${simcc.domain}")
+    private String SIMCC_DOMAIN;
+
     /**
      * Security rules applied:
      *  CSRF protection is disabled (stateless REST API)
@@ -40,10 +44,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> corsConfigurationSource())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/reg", "/api/users/check-if-exist").permitAll()
                         .requestMatchers("/api/infected/reg").permitAll()
+                        .requestMatchers("/ws/infected").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> basic.disable())
@@ -51,6 +56,8 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+
 
     /**
      * Configures CORS (Cross-Origin Resource Sharing) for the application.
@@ -65,10 +72,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of(SIMCC_DOMAIN));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        config.setAllowedHeaders(List.of("*"));
 
+        config.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type"
+        ));
         return new UrlBasedCorsConfigurationSource(){{
            registerCorsConfiguration("/**", config);
         }};

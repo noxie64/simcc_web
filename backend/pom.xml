@@ -93,6 +93,10 @@
             <artifactId>spring-messaging</artifactId>
             <version>6.2.12</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-websocket</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

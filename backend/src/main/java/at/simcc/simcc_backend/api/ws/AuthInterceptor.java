@@ -2,6 +2,7 @@ package at.simcc.simcc_backend.api.ws;
 
 import at.simcc.simcc_backend.repo.InfectedRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
@@ -16,6 +17,7 @@ import java.util.UUID;
  * Date: 4/14/26
  */
 @RequiredArgsConstructor
+@Slf4j
 public class AuthInterceptor implements HandshakeInterceptor {
     private final InfectedRepository infectedRepository;
 
@@ -26,8 +28,10 @@ public class AuthInterceptor implements HandshakeInterceptor {
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
+
+        log.info(request.getHeaders().toString());
         if (request.getHeaders().containsHeader("Authorization")) {
-            if (request.getHeaders().getFirst("Authorization").startsWith("IID ")) {
+            if (request.getHeaders().getFirst("Authorization").startsWith("Bearer ")) {
                 try {
                     UUID iid = UUID.fromString(request.getHeaders().getFirst("Authorization").split("IID ")[1]);
                     if (infectedRepository.existsInfectedByIid(iid)) {
