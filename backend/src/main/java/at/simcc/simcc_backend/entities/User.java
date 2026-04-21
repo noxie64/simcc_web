@@ -45,7 +45,6 @@ public class User {
     /**
      * Is made for checking, if the account is meant as admin or user
      */
-
     @Transient
     private Boolean isAdmin;
 }

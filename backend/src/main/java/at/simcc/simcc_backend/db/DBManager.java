@@ -36,6 +36,7 @@ public class DBManager implements ApplicationRunner {
                 .username("admin")
                 .email("admin@admin.com")
                 .password("should_be_a_hash")
+                .isAdmin(false)
                 .build();
 
 
