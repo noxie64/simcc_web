@@ -28,7 +28,6 @@ public class AuthInterceptor implements HandshakeInterceptor {
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
-
         log.info(request.getHeaders().toString());
         if (request.getHeaders().containsHeader("Authorization")) {
             if (request.getHeaders().getFirst("Authorization").startsWith("Bearer ")) {

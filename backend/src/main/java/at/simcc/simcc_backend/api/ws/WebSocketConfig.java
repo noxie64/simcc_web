@@ -24,7 +24,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new WebsocketHandler(infectedRepository), "/ws/infected")
-                .setHandshakeHandler(new RelaxedHandshakeHandler())
-                .setAllowedOrigins(domain);
+                .setAllowedOriginPatterns("*");
     }
 }

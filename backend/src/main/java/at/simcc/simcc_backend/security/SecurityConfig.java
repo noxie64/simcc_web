@@ -48,7 +48,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/reg", "/api/users/check-if-exist").permitAll()
                         .requestMatchers("/api/infected/reg").permitAll()
-                        .requestMatchers("/ws/infected").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/error").permitAll() // <-- add this
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> basic.disable())
@@ -72,12 +73,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(SIMCC_DOMAIN));
+        config.setAllowedOrigins(List.of("http://localhost:8080"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
 
         config.setAllowedHeaders(List.of(
                 "Authorization",
-                "Content-Type"
+                "Content-Type",
+                "Connection",
+                "Upgrade"
         ));
         return new UrlBasedCorsConfigurationSource(){{
            registerCorsConfiguration("/**", config);
