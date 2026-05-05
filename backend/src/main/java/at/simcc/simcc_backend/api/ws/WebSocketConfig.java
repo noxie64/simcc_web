@@ -3,8 +3,16 @@ package at.simcc.simcc_backend.api.ws;
 import at.simcc.simcc_backend.repo.InfectedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
+import org.springframework.web.socket.server.HandshakeInterceptor;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
+
+import java.util.Map;
 
 /**
  * Project: SimCC-Backend
@@ -24,6 +32,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new WebsocketHandler(infectedRepository), "/ws/infected")
-                .setAllowedOriginPatterns("*");
+                .setAllowedOrigins("*");
     }
 }
