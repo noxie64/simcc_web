@@ -1,7 +1,9 @@
 package at.simcc.simcc_backend.api.ws;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Project: SimCC-Backend
@@ -10,6 +12,8 @@ import lombok.Data;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Message {
     private MessageType type;
     private Object payload;

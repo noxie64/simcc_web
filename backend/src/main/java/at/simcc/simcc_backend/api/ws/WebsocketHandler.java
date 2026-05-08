@@ -38,6 +38,7 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
         try {
+
             Message msg = objectMapper.readValue(message.getPayload(), Message.class);
 
             switch (msg.getType()) {

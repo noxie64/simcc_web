@@ -3,6 +3,7 @@ package at.simcc.simcc_backend.api.ws;
 import at.simcc.simcc_backend.repo.InfectedRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
@@ -32,16 +33,16 @@ public class AuthInterceptor implements HandshakeInterceptor {
         if (request.getHeaders().containsHeader("Authorization")) {
             if (request.getHeaders().getFirst("Authorization").startsWith("Bearer ")) {
                 try {
-                    UUID iid = UUID.fromString(request.getHeaders().getFirst("Authorization").split("IID ")[1]);
+                    UUID iid = UUID.fromString(request.getHeaders().getFirst("Authorization").split("Bearer ")[1]);
                     if (infectedRepository.existsInfectedByIid(iid)) {
                         attributes.put("authenticated", true);
                         return true;
                     }
-                } catch (ArrayIndexOutOfBoundsException | IllegalArgumentException e) {
-                    return false;
-                }
+                } catch (ArrayIndexOutOfBoundsException | IllegalArgumentException _) {}
             }
         }
+
+        response.setStatusCode(HttpStatusCode.valueOf(403));
 
         return false;
     }
