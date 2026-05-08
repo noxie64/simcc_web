@@ -19,7 +19,7 @@ export const Initialization: React.FC = () => {
             setUsername("");
             setEmail("");
             setPassword("");
-            navigate("/twofa");
+            navigate("/twofa", {state: {username}});
             console.log(response);
         } catch (error) {
             console.error("Error: " + error);
