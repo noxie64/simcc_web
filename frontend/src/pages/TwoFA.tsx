@@ -46,7 +46,7 @@ export const TwoFA: React.FC = () => {
     useEffect(() => {
         const verification = async () => {
             if (isVerified){
-                navigate("/");
+                navigate("/login");
             }
         };
         verification();
