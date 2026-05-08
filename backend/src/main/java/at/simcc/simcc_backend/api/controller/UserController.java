@@ -57,4 +57,19 @@ public class UserController {
         return ResponseEntity.ok(userService.isValid(secret, code));
     }
 
+    /**
+     * Verify, if the user credentials for login is right
+     * @param email -> email of the user
+     * @param password -> his password
+     * @return -> return a boolean depending on the credentials
+     */
+    @GetMapping("/login-user")
+    public ResponseEntity<Boolean> isValidUserCredential(@RequestParam String email, @RequestParam String password){
+        if (email.isEmpty() || password.isEmpty()){
+            return ResponseEntity.ok(false);
+        }
+
+        return ResponseEntity.ok(userService.isValidUserCredential(email, password));
+    }
+
 }

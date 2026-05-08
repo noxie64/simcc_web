@@ -144,4 +144,18 @@ public class UserService {
 
         return url;
     }
+
+    /**
+     * Verify, if the user credentials for login is right
+     * @param email -> email of the user
+     * @param password -> his password
+     * @return -> return a boolean depending on the credentials
+     */
+
+    public Boolean isValidUserCredential(String email, String password) {
+        User user = userRepo.getByEmail(email);
+        String rightPassword = user != null ?  user.getPassword() : "";
+
+        return passwordEncoder.matches(password, rightPassword);
+    }
 }
