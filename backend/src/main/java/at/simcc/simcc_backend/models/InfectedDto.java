@@ -4,13 +4,14 @@ import at.simcc.simcc_backend.entities.OSType;
 import lombok.Value;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * DTO for {@link at.simcc.simcc_backend.entities.Infected}
  */
 @Value
 public class InfectedDto implements Serializable {
-    Long iid;
+    UUID iid;
     OSType osType;
     String osSubType;
     String osInfo;

@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.UUID;
+
 /**
  * Project: SimCC-Backend
  * Created by: Georg Kollegger
@@ -21,7 +23,7 @@ import org.hibernate.type.SqlTypes;
 public class Infected {
     @Id
     @GeneratedValue
-    private Long iid;
+    private UUID iid;
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private OSType osType;
