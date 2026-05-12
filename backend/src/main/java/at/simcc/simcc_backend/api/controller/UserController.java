@@ -72,4 +72,21 @@ public class UserController {
         return ResponseEntity.ok(userService.isValidUserCredential(email, password));
     }
 
+    /**
+     * Verify the 2fa code, that user typed after the login
+     * @param email -> email of the user
+     * @param code -> 2fa code that user typed
+     * @return -> returns if the code is correct or not
+     */
+    @GetMapping("/verify-2fa-after-login")
+    public ResponseEntity<Boolean> isValid2FACode(@RequestParam String email, @RequestParam String code){
+        Integer codeL = Integer.parseInt(code);
+        String secret = userRepo.getUserByEmail(email).getTotpSecret();
+        if (code.isEmpty()){
+            return ResponseEntity.ok(false);
+        }
+
+        return ResponseEntity.ok(userService.isValid(secret ,codeL));
+    }
+
 }

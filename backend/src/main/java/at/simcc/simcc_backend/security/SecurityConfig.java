@@ -38,7 +38,8 @@ public class SecurityConfig {
      *      GET /api/users/check-if-exist,
      *      GET /api/users/obtain-qr-url,
      *      GET /api/users/verify-2fa,
-     *      GET /api/users/login-user"
+     *      GET /api/users/login-user,
+     *      GET /api/users/verify-2fa-after-login
      *  All other endpoints require authentication
      *  HTTP Basic and form-based login are disabled
      * @param http -> is used for setting all http configurations
@@ -58,9 +59,12 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(
-                            "/api/users/obtain-qr-url",
-                            "/api/users/verify-2fa",
-                            "/api/users/login-user"
+                                "/api/users/reg",
+                                "/api/users/check-if-exist",
+                                "/api/users/obtain-qr-url",
+                                "/api/users/verify-2fa",
+                                "/api/users/login-user",
+                                "/api/users/verify-2fa-after-login"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
