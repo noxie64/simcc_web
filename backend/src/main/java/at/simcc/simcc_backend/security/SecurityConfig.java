@@ -1,5 +1,6 @@
 package at.simcc.simcc_backend.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,6 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 import java.util.List;
 
@@ -23,6 +25,9 @@ public class SecurityConfig {
     public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
+    @Value("${simcc.domain}")
+    private String SIMCC_DOMAIN;
 
     /**
      * Security rules applied:
@@ -48,6 +53,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers("/api/users/reg", "/api/users/check-if-exist").permitAll()
+                        .requestMatchers("/api/infected/reg").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers(
                                 "/api/users/reg",
                                 "/api/users/check-if-exist",
@@ -64,6 +74,8 @@ public class SecurityConfig {
         return http.build();
     }
 
+
+
     /**
      * Configures CORS (Cross-Origin Resource Sharing) for the application.
      * CORS rules applied:
@@ -79,8 +91,13 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        config.setAllowedHeaders(List.of("*"));
 
+        config.setAllowedHeaders(List.of(
+                "Authorization",
+                "Content-Type",
+                "Connection",
+                "Upgrade"
+        ));
         return new UrlBasedCorsConfigurationSource(){{
            registerCorsConfiguration("/**", config);
         }};
