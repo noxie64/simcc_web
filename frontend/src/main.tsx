@@ -6,6 +6,7 @@ import NavLayout from './components/NavLayout'
 import Dummy from './pages/Dummy'
 import {Initialization} from "./pages/Initialization.tsx";
 import {TwoFA} from "./pages/TwoFA.tsx";
+import {Login} from "./pages/Login.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')!).render(
             </Route>
             <Route path= '/init' element={<Initialization/>}/>
             <Route path= '/twofa' element={<TwoFA/>}/>
+            <Route path= '/login' element={<Login/>}/>
         </Routes>
     </BrowserRouter>
   </StrictMode>,

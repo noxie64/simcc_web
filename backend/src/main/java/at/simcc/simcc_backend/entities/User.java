@@ -36,7 +36,7 @@ public class User {
     private Long userId;
     @Column(nullable = false, unique = true)
     private String username;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false)
     private String password;
@@ -48,7 +48,6 @@ public class User {
     /**
      * Is made for checking, if the account is meant as admin or user
      */
-
     @Transient
     @Builder.Default
     private Boolean isAdmin = false;

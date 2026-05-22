@@ -33,10 +33,15 @@ public class SecurityConfig {
      * Security rules applied:
      *  CSRF protection is disabled (stateless REST API)
      *  CORS is configured via {@link #corsConfigurationSource()}
-     *  Public endpoints: POST /api/users/reg, GET /api/users/check-if-exist
+     *  Public endpoints:
+     *      POST /api/users/reg,
+     *      GET /api/users/check-if-exist,
+     *      GET /api/users/obtain-qr-url,
+     *      GET /api/users/verify-2fa,
+     *      GET /api/users/login-user"
      *  All other endpoints require authentication
      *  HTTP Basic and form-based login are disabled
-     * @param http
+     * @param http -> is used for setting all http configurations
      * @return
      * @throws Exception
      */
@@ -47,10 +52,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers("/api/users/reg", "/api/users/check-if-exist").permitAll()
                         .requestMatchers("/api/infected/reg").permitAll()
                         .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/error").permitAll() // <-- add this
+                        .requestMatchers("/error").permitAll()
+                                "/api/users/obtain-qr-url",
+                                "/api/users/verify-2fa",
+                                "/api/users/login-user"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> basic.disable())
