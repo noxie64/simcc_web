@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Project: SimCC-Backend
@@ -16,5 +17,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Message {
     private MessageType type;
-    private Object payload;
+    private JsonNode payload;
 }

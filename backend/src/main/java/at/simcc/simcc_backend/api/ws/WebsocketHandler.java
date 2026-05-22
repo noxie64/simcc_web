@@ -2,6 +2,7 @@ package at.simcc.simcc_backend.api.ws;
 
 import at.simcc.simcc_backend.api.ws.payload.ERRPayload;
 import at.simcc.simcc_backend.api.ws.payload.ErrType;
+import at.simcc.simcc_backend.api.ws.payload.StringPayload;
 import at.simcc.simcc_backend.repo.InfectedRepository;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.RequiredArgsConstructor;
@@ -30,27 +31,33 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
     private final ObjectMapper objectMapper = JsonMapper.builder()
                 .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
                 .build();
-
     private final Set<WebSocketSession> sessions =
             ConcurrentHashMap.newKeySet();
+
     private final InfectedRepository infectedRepository;
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
         try {
-
             Message msg = objectMapper.readValue(message.getPayload(), Message.class);
 
             switch (msg.getType()) {
-                case HELLO -> sendMessage(session, Message.builder().type(MessageType.GOODBYE).payload(
-                        "You said: %s, good bye!".formatted(msg.getPayload())
-                ).build());
-            }
+                case HELLO -> {
+                    StringPayload helloPayload = objectMapper.treeToValue(msg.getPayload(), StringPayload.class);
 
-            if (msg.getType() == MessageType.HELLO) {
-                sendMessage(session, Message.builder().type(MessageType.GOODBYE).payload(
-                        "You said: %s, good bye!".formatted(msg.getPayload())
-                ).build());
+                    sendMessage(session,
+                            Message.builder()
+                                    .type(MessageType.GOODBYE)
+                                    .payload(
+                                            objectMapper.valueToTree(
+                                                    StringPayload.builder()
+                                                            .content("You said: %s, goodbye!".formatted(helloPayload.getContent()))
+                                                            .build()
+                                            )
+                                    )
+                                    .build()
+                    );
+                }
             }
         } catch (JacksonException e) {
             sendError(
@@ -81,7 +88,9 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
                 objectMapper.writeValueAsString(
                         Message.builder()
                                 .type(MessageType.ERR)
-                                .payload(errPayload)
+                                .payload(
+                                        objectMapper.valueToTree(errPayload)
+                                )
                                 .build()
                 )
         ));
