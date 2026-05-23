@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from "react"
 import api from "../api/baseUrl.ts";
 import {useNavigate} from "react-router";
+import { useTitle } from "../hooks/useTitle.ts";
 
 export const Initialization: React.FC = () => {
+    useTitle("Setup");
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
