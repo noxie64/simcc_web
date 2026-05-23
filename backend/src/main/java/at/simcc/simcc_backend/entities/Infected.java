@@ -29,4 +29,6 @@ public class Infected {
     private OSType osType;
     private String osSubType;
     private String osInfo;
+    @Transient
+    private boolean online;
 }

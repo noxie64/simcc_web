@@ -3,6 +3,7 @@ package at.simcc.simcc_backend.api.ws;
 import at.simcc.simcc_backend.api.ws.payload.ERRPayload;
 import at.simcc.simcc_backend.api.ws.payload.ErrType;
 import at.simcc.simcc_backend.api.ws.payload.StringPayload;
+import at.simcc.simcc_backend.entities.Infected;
 import at.simcc.simcc_backend.repo.InfectedRepository;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -72,11 +74,16 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         sessions.add(session);
+        Infected infected = (Infected) infectedRepository.findFirstByIid((UUID) session.getAttributes().get("iid"));
+        infected.setOnline(true);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         sessions.remove(session);
+        Infected infected = (Infected) infectedRepository.findFirstByIid((UUID) session.getAttributes().get("iid"));
+        infected.setOnline(false);
+
     }
 
     private void sendMessage(WebSocketSession session, Message message) throws IOException {

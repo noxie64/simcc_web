@@ -35,7 +35,7 @@ public class AuthInterceptor implements HandshakeInterceptor {
                 try {
                     UUID iid = UUID.fromString(request.getHeaders().getFirst("Authorization").split("Bearer ")[1]);
                     if (infectedRepository.existsInfectedByIid(iid)) {
-                        attributes.put("authenticated", true);
+                        attributes.put("iid", iid);
                         return true;
                     }
                 } catch (ArrayIndexOutOfBoundsException | IllegalArgumentException _) {}
