@@ -8,6 +8,7 @@ export default function NavLayout() {
     const [selected, setSelected] = useState<string>();
 
     const style = (name: string) => {
+        // check if the current route is equal to the name we keep track off
         if (name == selected) {
             return "bg-primary text-white rounded p-2";
         }
