@@ -1,15 +1,14 @@
 package at.simcc.simcc_backend.entities;
 
+import at.simcc.simcc_backend.entities.trojan_setting.TrojanSetting;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-import org.springframework.data.annotation.CreatedDate;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Project: SimCC-Backend
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TrojanSession {
+public class Trojan {
     @Id
     @GeneratedValue
     private Long trojanId;
@@ -35,4 +34,7 @@ public class TrojanSession {
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
+
+    @OneToMany(mappedBy = "trojan", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    private List<TrojanSetting> trojanSettings;
 }

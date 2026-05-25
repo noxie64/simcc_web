@@ -1,11 +1,16 @@
 import { useTitle } from "../hooks/useTitle";
-import Dummy from "./Dummy";
 
 export default function Trojans() {
     useTitle("Trojans");
 
     return (
-        <Dummy />
+        <div className="flex flex-col">
+            <div className="modal-action">
+                <form method="dialog">
+                    <button className="btn">Close</button>
+                </form>
+            </div>
+        </div>
     )
 }
 

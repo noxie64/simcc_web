@@ -1,11 +1,8 @@
 package at.simcc.simcc_backend.api.dal;
 
 import at.simcc.simcc_backend.entities.Infected;
-import at.simcc.simcc_backend.entities.TrojanSession;
 import at.simcc.simcc_backend.mapper.InfectedMapper;
-import at.simcc.simcc_backend.models.InfectedDto;
 import at.simcc.simcc_backend.models.InfectedIdDto;
-import at.simcc.simcc_backend.models.InfectedNoIdDto;
 import at.simcc.simcc_backend.repo.InfectedRepository;
 import at.simcc.simcc_backend.repo.TrojanSessionRepository;
 import jakarta.persistence.EntityNotFoundException;
