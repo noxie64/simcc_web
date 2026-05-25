@@ -56,6 +56,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/users/reg", "/users/check-if-exist").permitAll()
                         .requestMatchers("/infected/reg").permitAll()
+                        .requestMatchers("/trojan/create").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(
