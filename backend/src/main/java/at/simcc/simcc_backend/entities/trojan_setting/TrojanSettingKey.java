@@ -1,6 +1,12 @@
 package at.simcc.simcc_backend.entities.trojan_setting;
 
+import at.simcc.simcc_backend.api.validation.TrojanBuildConfigDefaults;
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 
@@ -9,7 +15,6 @@ import java.util.function.Function;
  * Created by: Georg Kollegger
  * Date: 5/25/26
  */
-@AllArgsConstructor
 public enum TrojanSettingKey {
 
     HOST {
@@ -32,5 +37,5 @@ public enum TrojanSettingKey {
     };
 
     public abstract Class<?> expectedType();
-
+    public Object defaultValue;
 }

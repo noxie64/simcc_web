@@ -1,6 +1,7 @@
 package at.simcc.simcc_backend.api.controller;
 
 import at.simcc.simcc_backend.api.body.TrojanCreationRequest;
+import at.simcc.simcc_backend.api.service.TrojanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Slf4j
 public class TrojanController {
+    private final TrojanService trojanService;
 
     @PostMapping("/create")
     public void createTrojan(@Valid @RequestBody TrojanCreationRequest body) {
-
-        log.info(body.name());
+        trojanService.createTrojan(body.name(), body.buildConfig());
     }
 
 }

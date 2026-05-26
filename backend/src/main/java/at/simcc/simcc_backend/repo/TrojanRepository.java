@@ -10,7 +10,7 @@ import java.util.Optional;
  * Created by: Georg Kollegger
  * Date: 3/27/26
  */
-public interface TrojanSessionRepository extends JpaRepository<Trojan, Long> {
+public interface TrojanRepository extends JpaRepository<Trojan, Long> {
 
     Optional<Trojan> findTrojanSessionByCcid(String ccid);
 }

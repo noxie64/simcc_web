@@ -2,7 +2,7 @@ package at.simcc.simcc_backend.db;
 
 import at.simcc.simcc_backend.entities.Trojan;
 import at.simcc.simcc_backend.entities.User;
-import at.simcc.simcc_backend.repo.TrojanSessionRepository;
+import at.simcc.simcc_backend.repo.TrojanRepository;
 import at.simcc.simcc_backend.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +22,7 @@ import static at.simcc.simcc_backend.SimccBackendApplication.RANDOM;
 @Component
 @RequiredArgsConstructor
 public class DBManager implements ApplicationRunner {
-    private final TrojanSessionRepository trojanSessionRepo;
+    private final TrojanRepository trojanRepository;
     private final UserRepository userRepo;
 
     @Value("${spring.jpa.hibernate.ddl-auto}")
@@ -45,7 +45,7 @@ public class DBManager implements ApplicationRunner {
                 .createdBy(user)
                 .build();
 
-        trojanSessionRepo.save(trojan);
+        trojanRepository.save(trojan);
 
     }
 

@@ -2,7 +2,10 @@ package at.simcc.simcc_backend.entities.trojan_setting;
 
 import at.simcc.simcc_backend.entities.Trojan;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Struct;
 import org.hibernate.type.SqlTypes;
@@ -15,6 +18,9 @@ import org.hibernate.type.SqlTypes;
 @Entity
 @Data
 @IdClass(TrojanSettingID.class)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TrojanSetting {
     @Id
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
@@ -24,4 +30,5 @@ public class TrojanSetting {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private TrojanSettingKey key;
+    private String value;
 }
