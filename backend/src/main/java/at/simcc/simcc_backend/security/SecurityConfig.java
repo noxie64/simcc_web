@@ -26,9 +26,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Value("${simcc.domain}")
-    private String SIMCC_DOMAIN;
-
     /**
      * Security rules applied:
      *  CSRF protection is disabled (stateless REST API)
