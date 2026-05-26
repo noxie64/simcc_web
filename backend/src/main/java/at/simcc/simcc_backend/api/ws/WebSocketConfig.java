@@ -26,9 +26,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final InfectedRepository infectedRepository;
 
-    @Value("${simcc.domain}")
-    private String domain;
-
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new WebsocketHandler(infectedRepository), "/ws/infected")

@@ -19,7 +19,7 @@ export const Login: React.FC = () => {
     const [code, setCode] = useState<string>("");
 
     const forgotPassword = () => {
-        navigate("/dummy");
+        navigate("/");
     }
 
     const login = async () => {
@@ -49,7 +49,7 @@ export const Login: React.FC = () => {
 
     useEffect(()=>{
         if(isValid){
-            navigate("/dummy");
+            navigate("/dashboard", {state : true});
         }
     }, [isValid])
 

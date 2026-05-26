@@ -9,6 +9,7 @@ import { Login } from "./pages/Login.tsx";
 import Infected from './pages/Infected.tsx'
 import Settings from './pages/Settings.tsx'
 import Trojans from './pages/Trojans.tsx'
+import {Dashboard} from "./pages/Dashboard.tsx"
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -19,6 +20,7 @@ createRoot(document.getElementById('root')!).render(
                     <Route path='/infected' element={<Infected />} />
                     <Route path='/settings' element={<Settings />} />
                     <Route path='/trojans' element={<Trojans />} />
+                    <Route path='/dashboard' element={<Dashboard />} />
                 </Route>
                 <Route path='/init' element={<Initialization />} />
                 <Route path='/twofa' element={<TwoFA />} />

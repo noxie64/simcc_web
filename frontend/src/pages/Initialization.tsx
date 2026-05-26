@@ -33,7 +33,7 @@ export const Initialization: React.FC = () => {
             try{
                 const response = await api.get("/users/check-if-exist");
                 if (response.data === true){
-                    navigate("/");
+                    navigate("/login");
                 }
             }catch (e) {
                 console.log("Error: " + e);

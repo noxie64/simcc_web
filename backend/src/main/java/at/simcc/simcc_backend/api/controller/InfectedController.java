@@ -3,6 +3,8 @@ package at.simcc.simcc_backend.api.controller;
 import at.simcc.simcc_backend.api.HTTPError;
 import at.simcc.simcc_backend.api.body.CCIDRequest;
 import at.simcc.simcc_backend.api.service.InfectedService;
+import at.simcc.simcc_backend.entities.Infected;
+import at.simcc.simcc_backend.models.InfectedDto;
 import at.simcc.simcc_backend.models.InfectedIdDto;
 import at.simcc.simcc_backend.models.InfectedNoIdDto;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Project: SimCC-Backend
@@ -39,5 +43,13 @@ public class InfectedController {
                     "The ccid was not found."
             ));
         }
+    }
+
+    /**
+     * Returns all infected systems by our virus
+     */
+    @GetMapping("/allInfected")
+    public ResponseEntity<List<InfectedDto>> getAllInfected(){
+        return ResponseEntity.ok(infectedService.getAllInfected());
     }
 }

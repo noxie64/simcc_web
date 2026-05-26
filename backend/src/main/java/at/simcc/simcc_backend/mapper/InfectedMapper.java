@@ -9,6 +9,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
+import java.util.List;
+
 /**
  * Project: SimCC-Backend
  * Created by: Georg Kollegger
@@ -20,6 +22,8 @@ public interface InfectedMapper {
     Infected toEntity(InfectedDto infectedDto);
 
     InfectedDto toGenericDto(Infected infected);
+
+    List<InfectedDto> toGenericDto(List<Infected> infecteds);
 
     Infected toEntity(InfectedIdDto infectedIdDto);
 
