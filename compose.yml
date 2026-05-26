@@ -23,6 +23,7 @@ services:
 
   frontend:
     depends_on:
+      - traefik
       - backend
     build:
       context: frontend/
@@ -76,7 +77,7 @@ services:
     ports:
       - "7777:80"
     volumes:
-      - ${DOCKER_HOST:-/var/run/docker.sock}:/var/run/docker.sock
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock
 configs:
   pgadmin-servers:
     content: |
