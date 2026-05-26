@@ -3,11 +3,13 @@ import {useLocation, useNavigate} from "react-router";
 import type {Infected} from "../types/infected.ts";
 import api from "../api/baseUrl.ts";
 import {InfectedCard} from "../components/InfectedCard.tsx";
+import {useTitle} from "../hooks/useTitle.ts";
 
-export const Dashboard: React.FC = () => {
+export const InfectedPage: React.FC = () => {
     const navigate = useNavigate();
     const [infected, setInfected] = useState<Infected[]>();
     const location = useLocation();
+    useTitle("InfectedPage");
 
     const obtainAllInfectedSystems = async () => {
         const response = await api.get("/infected/allInfected");
