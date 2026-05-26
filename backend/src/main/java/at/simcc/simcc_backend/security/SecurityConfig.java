@@ -26,8 +26,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Value("${simcc.domain}")
-    private String SIMCC_DOMAIN;
 
     /**
      * Security rules applied:
@@ -64,7 +62,8 @@ public class SecurityConfig {
                                 "/api/users/obtain-qr-url",
                                 "/api/users/verify-2fa",
                                 "/api/users/login-user",
-                                "/api/users/verify-2fa-after-login"
+                                "/api/users/verify-2fa-after-login",
+                                "/api/infected/allInfected"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

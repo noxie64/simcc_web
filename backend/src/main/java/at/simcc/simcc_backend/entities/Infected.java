@@ -1,13 +1,11 @@
 package at.simcc.simcc_backend.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -29,4 +27,10 @@ public class Infected {
     private OSType osType;
     private String osSubType;
     private String osInfo;
+
+    @OneToMany(mappedBy = "infected",
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST},
+            fetch = FetchType.LAZY)
+    @EqualsAndHashCode.Exclude
+    private List<InfectedIP> infectedIPS;
 }
