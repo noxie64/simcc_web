@@ -49,7 +49,7 @@ export const Login: React.FC = () => {
 
     useEffect(()=>{
         if(isValid){
-            navigate("/dashboard", {state : true});
+            navigate("/infected", {state : true});
         }
     }, [isValid])
 
