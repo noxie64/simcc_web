@@ -9,7 +9,7 @@ export default function NavLayout() {
             <div className="p-5 shadow-md flex justify-between">
                 <div className="flex items-center gap-2">
                     <h1 className="text-2xl font-bold mr-3 cursor-pointer"
-                        onClick={() => navigate("/")}
+                        onClick={() => navigate("/dashboard")}
                     >SimCC</h1>
                     <h3 className="font-medium cursor-pointer">Infected</h3>
                     <h3 className="font-medium cursor-pointer">Trojan</h3>
