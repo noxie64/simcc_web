@@ -9,6 +9,7 @@ export const InfectedPage: React.FC = () => {
     const navigate = useNavigate();
     const [infected, setInfected] = useState<Infected[]>();
     const location = useLocation();
+    const [isLogedIn, setIsLogedIn] = useState(false);
     useTitle("InfectedPage");
 
     const obtainAllInfectedSystems = async () => {
@@ -25,7 +26,9 @@ export const InfectedPage: React.FC = () => {
      */
 
     useEffect(() => {
-        if (!location.state) {
+        const loggedIn = localStorage.getItem("isLoggedIn");
+        console.log(loggedIn);
+        if (!loggedIn) {
             navigate("/login");
             return;
         }

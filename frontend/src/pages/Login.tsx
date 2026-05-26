@@ -40,7 +40,12 @@ export const Login: React.FC = () => {
                     code: code
                 }});
 
-            setIsValid(response.data);
+            if (response.data === true) {
+                localStorage.setItem("isLoggedIn", "true");
+                navigate("/infected");
+            } else {
+                setIsValid(false);
+            }
         }
         else {
             setIsValid(false);
