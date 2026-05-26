@@ -1,24 +1,31 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { BrowserRouter, Route, Routes } from 'react-router'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import NavLayout from './components/NavLayout'
-import {Initialization} from "./pages/Initialization.tsx";
-import {TwoFA} from "./pages/TwoFA.tsx";
-import {Login} from "./pages/Login.tsx";
-import {Dashboard} from "./pages/Dashboard.tsx";
+import { Initialization } from "./pages/Initialization.tsx";
+import { TwoFA } from "./pages/TwoFA.tsx";
+import { Login } from "./pages/Login.tsx";
+import Infected from './pages/Infected.tsx'
+import Settings from './pages/Settings.tsx'
+import Trojans from './pages/Trojans.tsx'
+import {Dashboard} from "./pages/Dashboard.tsx"
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter>
-        <Routes>
-            <Route element={<NavLayout />}>
-                <Route path='/dashboard' element={<Dashboard />} />
-            </Route>
-            <Route path= '/init' element={<Initialization/>}/>
-            <Route path= '/twofa' element={<TwoFA/>}/>
-            <Route path= '/login' element={<Login/>}/>
-        </Routes>
-    </BrowserRouter>
-  </StrictMode>,
+    <StrictMode>
+        <BrowserRouter>
+            <Routes>
+                <Route element={<NavLayout />} path='/'>
+                    <Route index element={<Navigate to="/infected" replace />} />
+                    <Route path='/infected' element={<Infected />} />
+                    <Route path='/settings' element={<Settings />} />
+                    <Route path='/trojans' element={<Trojans />} />
+                    <Route path='/dashboard' element={<Dashboard />} />
+                </Route>
+                <Route path='/init' element={<Initialization />} />
+                <Route path='/twofa' element={<TwoFA />} />
+                <Route path='/login' element={<Login />} />
+            </Routes>
+        </BrowserRouter>
+    </StrictMode>,
 )

@@ -22,7 +22,7 @@ import java.util.List;
  * Date: 4/10/26
  */
 @RestController
-@RequestMapping("/api/infected")
+@RequestMapping("/infected")
 @RequiredArgsConstructor
 public class InfectedController {
     private final InfectedService infectedService;

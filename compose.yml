@@ -1,7 +1,6 @@
 name: simcc
-
 services:
-  app-dev:
+  backend:
     depends_on:
       - postgres
       - pgadmin
@@ -10,12 +9,36 @@ services:
       target: dev
     env_file:
       - "backend/.env"
+    expose:
+      - "8080"
     ports:
-      - "8080:8080" # web
-      - "5005:5005" # debug
+      - "5005:5005"
+    labels:
+      - "traefik.enable=true" 
+      - "traefik.http.routers.simcc-backend.rule=PathPrefix(`/api`)"
+      - "traefik.http.services.simcc-backend.loadbalancer.server.port=8080"
     volumes:
-      - ./backend:/app # live source mount
+      - ./backend:/app
       - ~/.m2:/root/.m2
+
+  frontend:
+    depends_on:
+      - traefik
+      - backend
+    build:
+      context: frontend/
+      target: dev
+    expose:
+      - "5173"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.simcc-frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.services.simcc-frontend.loadbalancer.server.port=5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+
   postgres:
     image: postgres:16
     restart: unless-stopped
@@ -23,13 +46,16 @@ services:
       - "backend/.env"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
   pgadmin:
     image: dpage/pgadmin4
     restart: unless-stopped
-    ports:
-      - "5050:80"
+    expose:
+      - "80"
+    environment:
+      SCRIPT_NAME: /pgadmin
     env_file:
-      - "backend/.env"
+      - "./backend/.env"
     volumes:
       - pgadmin-store:/var/lib/pgadmin/
     depends_on:
@@ -38,6 +64,20 @@ services:
       - source: pgadmin-servers
         target: /pgadmin4/servers.json
         mode: 0444
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin.rule=PathPrefix(`/pgadmin`)"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+
+  traefik:
+    image: traefik:v3.0
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false" 
+    ports:
+      - "7777:80"
+    volumes:
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock
 configs:
   pgadmin-servers:
     content: |

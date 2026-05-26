@@ -32,12 +32,12 @@ public class SecurityConfig {
      *  CSRF protection is disabled (stateless REST API)
      *  CORS is configured via {@link #corsConfigurationSource()}
      *  Public endpoints:
-     *      POST /api/users/reg,
-     *      GET /api/users/check-if-exist,
-     *      GET /api/users/obtain-qr-url,
-     *      GET /api/users/verify-2fa,
-     *      GET /api/users/login-user,
-     *      GET /api/users/verify-2fa-after-login
+     *      POST /users/reg,
+     *      GET /users/check-if-exist,
+     *      GET /users/obtain-qr-url,
+     *      GET /users/verify-2fa,
+     *      GET /users/login-user,
+     *      GET /users/verify-2fa-after-login
      *  All other endpoints require authentication
      *  HTTP Basic and form-based login are disabled
      * @param http -> is used for setting all http configurations
@@ -51,20 +51,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers("/api/users/reg", "/api/users/check-if-exist").permitAll()
-                        .requestMatchers("/api/infected/reg").permitAll()
+                        .requestMatchers("/infected/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers(
-                                "/api/users/reg",
-                                "/api/users/check-if-exist",
-                                "/api/users/obtain-qr-url",
-                                "/api/users/verify-2fa",
-                                "/api/users/login-user",
-                                "/api/users/verify-2fa-after-login",
-                                "/api/infected/allInfected"
-                        ).permitAll()
+                        .requestMatchers("/users/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> basic.disable())
