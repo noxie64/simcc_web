@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Project: SimCC-Backend
@@ -22,10 +23,10 @@ import java.util.List;
 public class Trojan {
     @Id
     @GeneratedValue
-    private Long trojanId;
+    private UUID ccid;
 
-    @Column(nullable = false, unique = true)
-    private String ccid;
+    @Column(nullable = false, length = 64)
+    private String name;
 
     @CreationTimestamp
     @Column(updatable = false)

@@ -47,7 +47,7 @@ public class User {
     private LocalDateTime createdAt;
     private String totpSecret;
 
-    @OneToMany(mappedBy = "trojanId", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "createdBy", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private List<Trojan> trojans;
 
     /**

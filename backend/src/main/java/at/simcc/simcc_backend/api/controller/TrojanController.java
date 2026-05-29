@@ -2,6 +2,7 @@ package at.simcc.simcc_backend.api.controller;
 
 import at.simcc.simcc_backend.api.body.TrojanCreationRequest;
 import at.simcc.simcc_backend.api.service.TrojanService;
+import at.simcc.simcc_backend.entities.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +24,8 @@ public class TrojanController {
     private final TrojanService trojanService;
 
     @PostMapping("/create")
-    public void createTrojan(@Valid @RequestBody TrojanCreationRequest body) {
-        trojanService.createTrojan(body.name(), body.buildConfig());
+    public void createTrojan(User user, @Valid @RequestBody TrojanCreationRequest body) {
+        trojanService.createTrojan(body.name(), body.buildConfig(), user);
     }
 
 }

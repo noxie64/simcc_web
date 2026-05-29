@@ -3,6 +3,7 @@ package at.simcc.simcc_backend.api.service;
 import at.simcc.simcc_backend.api.body.TrojanCreationRequest;
 import at.simcc.simcc_backend.api.validation.TrojanBuildConfigDefaults;
 import at.simcc.simcc_backend.entities.Trojan;
+import at.simcc.simcc_backend.entities.User;
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSetting;
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSettingKey;
 import at.simcc.simcc_backend.repo.TrojanRepository;
@@ -26,7 +27,7 @@ public class TrojanService {
     private final TrojanRepository trojanRepository;
     private final TrojanBuildConfigDefaults buildConfigDefaults;
 
-    public void createTrojan(String name, Map<TrojanSettingKey, Object> buildConfig) {
+    public void createTrojan(String name, Map<TrojanSettingKey, Object> buildConfig, User user) {
 
         List<TrojanSetting> trojanSettings = new ArrayList<>();
         for (TrojanSettingKey key : TrojanSettingKey.values()) {
@@ -48,6 +49,11 @@ public class TrojanService {
         }
 
         Trojan trojan = new Trojan()
-        return;
+                .builder()
+                .name(name)
+                .createdBy(user)
+                .trojanSettings(trojanSettings)
+                .build();
+        trojanRepository.save(trojan);
     }
 }

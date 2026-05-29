@@ -36,12 +36,8 @@ public class DBManager implements ApplicationRunner {
                 .isAdmin(false)
                 .build();
 
-
-        byte[] ccidBytes = new byte[32];
-        RANDOM.nextBytes(ccidBytes);
-
         Trojan trojan = Trojan.builder()
-                .ccid(Base64.getUrlEncoder().withoutPadding().encodeToString(ccidBytes))
+                .name("Test")
                 .createdBy(user)
                 .build();
 
