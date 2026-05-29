@@ -58,7 +58,11 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> basic.disable())
-                .formLogin(form -> form.disable());
+                .formLogin(form -> form.loginProcessingUrl("/users/login"))
+                .logout(logout ->
+                        logout.logoutUrl("/users/logout")
+                                .invalidateHttpSession(true)
+                                .deleteCookies("SESSION"));
 
         return http.build();
     }

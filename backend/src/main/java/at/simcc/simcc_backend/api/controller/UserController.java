@@ -1,6 +1,8 @@
 package at.simcc.simcc_backend.api.controller;
 
 import at.simcc.simcc_backend.api.service.UserService;
+import at.simcc.simcc_backend.entities.User;
+import at.simcc.simcc_backend.models.UserDto;
 import at.simcc.simcc_backend.models.UserLoginDto;
 import at.simcc.simcc_backend.repo.UserRepository;
 import jakarta.websocket.server.PathParam;
@@ -53,7 +55,7 @@ public class UserController {
      */
     @GetMapping("/verify-2fa")
     public ResponseEntity<Boolean> isValid2FA(@RequestParam Integer code, @RequestParam String username){
-        String secret = userRepo.getByUsername(username).getTotpSecret();
+        String secret = userRepo.getByUsername(username).orElseThrow().getTotpSecret();
         return ResponseEntity.ok(userService.isValid(secret, code));
     }
 
