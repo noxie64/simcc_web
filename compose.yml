@@ -15,12 +15,14 @@ services:
     ports:
       - "5005:5005"
     labels:
-      - "traefik.enable=true"
+      - "traefik.enable=true" 
       - "traefik.http.routers.simcc-backend.rule=PathPrefix(`/api`)"
       - "traefik.http.services.simcc-backend.loadbalancer.server.port=8080"
     volumes:
       - ./backend:/app
       - ~/.m2:/root/.m2
+      - ../simcc_data:/simcc_data
+
   frontend:
     depends_on:
       - traefik
@@ -104,7 +106,7 @@ services:
     image: traefik:v3.0
     command:
       - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.exposedbydefault=false" 
     ports:
       - "7777:80"
     volumes:
