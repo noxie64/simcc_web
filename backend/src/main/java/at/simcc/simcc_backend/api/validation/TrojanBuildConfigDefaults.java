@@ -32,7 +32,5 @@ public class TrojanBuildConfigDefaults {
                     .toUpperCase();
             TrojanSettingKey.valueOf(enumName).defaultValue = f.get(this);
         }
-
-        return;
     }
 }

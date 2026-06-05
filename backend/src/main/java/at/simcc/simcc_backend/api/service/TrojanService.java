@@ -54,6 +54,8 @@ public class TrojanService {
                 .createdBy(user)
                 .trojanSettings(trojanSettings)
                 .build();
+        trojan.getTrojanSettings().forEach(t -> t.setTrojan(trojan));
+
         trojanRepository.save(trojan);
     }
 }

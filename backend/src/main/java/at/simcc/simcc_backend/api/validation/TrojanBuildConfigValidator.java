@@ -23,12 +23,13 @@ public class TrojanBuildConfigValidator implements
             TrojanSettingKey key = entry.getKey();
             Object value = entry.getValue();
 
-            if (!key.expectedType().isAssignableFrom(value.getClass())) {
+            if (!key.expectedType().isAssignableFrom(value.getClass()) && !(key.expectedType() == Long.class && value.getClass() == Integer.class)) {
                 context.disableDefaultConstraintViolation();
                 context.buildConstraintViolationWithTemplate(
                         "Key '%s' was expected to be of type %s, but got %s!"
                                 .formatted(key.name(), key.expectedType().getSimpleName(), value.getClass().getSimpleName())
-                );
+                )
+                        .addConstraintViolation();
                 return false;
             }
         }

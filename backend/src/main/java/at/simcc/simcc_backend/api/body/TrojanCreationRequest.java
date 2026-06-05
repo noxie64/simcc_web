@@ -4,6 +4,7 @@ import at.simcc.simcc_backend.api.validation.TrojanBuildConfigConstraint;
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSettingKey;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import org.hibernate.validator.constraints.UUID;
 
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +15,9 @@ public record TrojanCreationRequest(
         String name,
 
         @TrojanBuildConfigConstraint
-        Map<TrojanSettingKey, Object> buildConfig
+        Map<TrojanSettingKey, Object> buildConfig,
+        // MUST BE REMOVED AS SOON AS REAL AUTH IS IN PLACE
+        @NotNull
+        Long userId
 ) {
 }

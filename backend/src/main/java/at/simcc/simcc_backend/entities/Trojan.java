@@ -4,6 +4,7 @@ import at.simcc.simcc_backend.entities.trojan_setting.TrojanSetting;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -20,6 +21,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Data
 public class Trojan {
     @Id
     @GeneratedValue

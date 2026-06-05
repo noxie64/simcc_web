@@ -3,13 +3,12 @@ package at.simcc.simcc_backend.api.controller;
 import at.simcc.simcc_backend.api.body.TrojanCreationRequest;
 import at.simcc.simcc_backend.api.service.TrojanService;
 import at.simcc.simcc_backend.entities.User;
+import at.simcc.simcc_backend.repo.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Project: simcc_backend
@@ -22,10 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class TrojanController {
     private final TrojanService trojanService;
+    private final UserRepository userRepo;
 
     @PostMapping("/create")
-    public void createTrojan(User user, @Valid @RequestBody TrojanCreationRequest body) {
+    public void createTrojan(@Valid @RequestBody TrojanCreationRequest body) {
+        User user = userRepo.findUserByUserId(body.userId());
+
         trojanService.createTrojan(body.name(), body.buildConfig(), user);
     }
-
 }
