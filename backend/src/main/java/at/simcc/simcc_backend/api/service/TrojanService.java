@@ -1,7 +1,6 @@
 package at.simcc.simcc_backend.api.service;
 
-import at.simcc.simcc_backend.api.body.TrojanCreationRequest;
-import at.simcc.simcc_backend.api.validation.TrojanBuildConfigDefaults;
+import at.simcc.simcc_backend.other.TrojanBuildConfigDefaultProperties;
 import at.simcc.simcc_backend.entities.Trojan;
 import at.simcc.simcc_backend.entities.User;
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSetting;
@@ -10,9 +9,7 @@ import at.simcc.simcc_backend.repo.TrojanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TrojanService {
     private final TrojanRepository trojanRepository;
-    private final TrojanBuildConfigDefaults buildConfigDefaults;
+    private final TrojanBuildConfigDefaultProperties buildConfigDefaults;
 
     public void createTrojan(String name, Map<TrojanSettingKey, Object> buildConfig, User user) {
 

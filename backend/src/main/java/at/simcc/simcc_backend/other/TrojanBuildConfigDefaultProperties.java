@@ -1,14 +1,12 @@
-package at.simcc.simcc_backend.api.validation;
+package at.simcc.simcc_backend.other;
 
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSettingKey;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 
 /**
  * Project: simcc_backend
@@ -18,7 +16,7 @@ import java.util.HashMap;
 @Component
 @ConfigurationProperties(prefix = "simcc.default")
 @Data
-public class TrojanBuildConfigDefaults {
+public class TrojanBuildConfigDefaultProperties {
     private String host;
     private Long httpCommanderReconnect;
     private Long wsCommanderReconnect;
