@@ -41,7 +41,9 @@ public class DBManager implements ApplicationRunner {
                 .createdBy(user)
                 .build();
 
-        trojanRepository.save(trojan);
+        if (userRepo.getByUsername(user.getUsername()) == null) {
+            trojanRepository.save(trojan);
+        }
 
     }
 
