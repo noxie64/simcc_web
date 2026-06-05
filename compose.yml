@@ -1,9 +1,10 @@
 name: simcc
+
 services:
   backend:
     depends_on:
-      - postgres
       - pgadmin
+      - redisinsight
     build:
       context: backend/
       target: dev
@@ -38,8 +39,6 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-
-
   postgres:
     image: postgres:16
     restart: unless-stopped
@@ -47,10 +46,11 @@ services:
       - "backend/.env"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
   pgadmin:
     image: dpage/pgadmin4
     restart: unless-stopped
+    depends_on:
+      - postgres
     expose:
       - "80"
     environment:
@@ -59,8 +59,6 @@ services:
       - "./backend/.env"
     volumes:
       - pgadmin-store:/var/lib/pgadmin/
-    depends_on:
-      - postgres
     configs:
       - source: pgadmin-servers
         target: /pgadmin4/servers.json
@@ -69,6 +67,40 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.pgadmin.rule=PathPrefix(`/pgadmin`)"
       - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    expose:
+      - "6379"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--user", "default", "off", "--user", "${REDIS_USERNAME}", "on", ">${REDIS_PASSWORD}", "allkeys", "allcommands"]
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      - RI_REDIS_HOST=redis
+      - RI_REDIS_PORT=6379
+      - RI_REDIS_USERNAME=${REDIS_USERNAME}
+      - RI_REDIS_PASSWORD=${REDIS_PASSWORD}
+      - RI_REDIS_ALIAS=simcc
+      - RI_PROXY_PATH=/redis
+    expose:
+      - "5540"
+    volumes:
+      - redisinsight-data:/data
+    depends_on:
+      - redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.redis_insight.rule=PathPrefix(`/redis`)"
+      - "traefik.http.services.redis_insight.loadbalancer.server.port=5540"
+
 
   traefik:
     image: traefik:v3.0
@@ -97,3 +129,5 @@ configs:
 volumes:
   postgres_data:
   pgadmin-store:
+  redis_data:
+  redisinsight-data:

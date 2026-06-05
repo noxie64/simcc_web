@@ -19,7 +19,7 @@ export const Login: React.FC = () => {
     const [code, setCode] = useState<string>("");
 
     const forgotPassword = () => {
-        navigate("/dummy");
+        navigate("/");
     }
 
     const login = async () => {
@@ -40,7 +40,12 @@ export const Login: React.FC = () => {
                     code: code
                 }});
 
-            setIsValid(response.data);
+            if (response.data === true) {
+                localStorage.setItem("isLoggedIn", "true");
+                navigate("/infected");
+            } else {
+                setIsValid(false);
+            }
         }
         else {
             setIsValid(false);
@@ -49,7 +54,7 @@ export const Login: React.FC = () => {
 
     useEffect(()=>{
         if(isValid){
-            navigate("/dummy");
+            navigate("/infected", {state : true});
         }
     }, [isValid])
 

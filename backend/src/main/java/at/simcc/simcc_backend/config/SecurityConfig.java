@@ -48,20 +48,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers("/users/reg", "/users/check-if-exist").permitAll()
-                        .requestMatchers("/infected/reg").permitAll()
-                        .requestMatchers("/trojan/create").permitAll()
+                        .requestMatchers("/infected/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/trojan/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers(
-                                "/users/reg",
-                                "/users/check-if-exist",
-                                "/users/obtain-qr-url",
-                                "/users/verify-2fa",
-                                "/users/login-user",
-                                "/users/verify-2fa-after-login"
-                        ).permitAll()
+                        .requestMatchers("/users/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> basic.disable())

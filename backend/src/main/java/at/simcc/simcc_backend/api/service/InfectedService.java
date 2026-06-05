@@ -1,9 +1,16 @@
 package at.simcc.simcc_backend.api.service;
 
 import at.simcc.simcc_backend.api.dal.InfectedDal;
+import at.simcc.simcc_backend.entities.Infected;
+import at.simcc.simcc_backend.mapper.InfectedMapper;
+import at.simcc.simcc_backend.models.InfectedDto;
 import at.simcc.simcc_backend.models.InfectedIdDto;
+import at.simcc.simcc_backend.repo.InfectedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Project: SimCC-Backend
@@ -14,10 +21,30 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class InfectedService {
     private final InfectedDal infectedDal;
+    private final InfectedRepository infectedRepo;
 
 
     public InfectedIdDto registerInfected(String ccid) {
         return infectedDal.registerInfected(ccid);
     }
 
+    /**
+     * Returns all infected systems by our virus
+     * @currentIpAddress -> the last used ip address
+     */
+    public List<InfectedDto> getAllInfected() {
+        List<Infected> infecteds = infectedRepo.findAll();
+        List<InfectedDto> infectedDtos = new ArrayList<>();
+        for (Infected infected : infecteds){
+            infectedDtos.add(InfectedDto.builder()
+                    .iid(infected.getIid())
+                    .osInfo(infected.getOsInfo())
+                    .osSubType(infected.getOsSubType())
+                    .osType(infected.getOsType())
+                    .currentIpAddress(infected.getInfectedIPS().getLast().getIp())
+                    .build());
+        }
+
+        return infectedDtos;
+    }
 }
