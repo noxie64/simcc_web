@@ -29,29 +29,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TrojanService {
     private final TrojanRepository trojanRepository;
-    private final TrojanBuildConfigDefaultProperties buildConfigDefaults;
-    private Git trojanGitRepo;
-
-
-    @PostConstruct
-    public void init() throws IOException, GitAPIException {
-        if (!Files.exists(SimccConstants.DATA_DIR)) {
-            Files.createDirectory(SimccConstants.DATA_DIR);
-        }
-
-        if (Files.exists(SimccConstants.TROJAN_DIR)) {
-            trojanGitRepo = Git.open(SimccConstants.TROJAN_DIR.toFile());
-        } else {
-            trojanGitRepo = Git.cloneRepository()
-                    .setURI("https://github.com/noxie64/simcc_trojan")
-                    .setDirectory(SimccConstants.TROJAN_DIR.toFile())
-                    .call();
-        }
-
-        if (!Files.exists(SimccConstants.BUILD_DIR)) {
-            Files.createDirectories(SimccConstants.BUILD_DIR);
-        }
-    }
 
     public void createTrojan(String name, Map<TrojanSettingKey, Object> buildConfig, User user) {
 
