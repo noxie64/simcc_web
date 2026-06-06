@@ -1,5 +1,6 @@
 package at.simcc.simcc_backend.entities;
 
+import at.simcc.simcc_backend.entities.trojan_setting.TrojanSetting;
 import at.simcc.simcc_backend.generator.CustomIdGenerator;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * Project: simcc_web
@@ -52,6 +54,9 @@ public class User implements UserDetails {
     @Column(updatable = false)
     private LocalDateTime createdAt;
     private String totpSecret;
+
+    @OneToMany(mappedBy = "createdBy", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    private List<Trojan> trojans;
 
     /**
      * Is made for checking, if the account is meant as admin or user

@@ -1,8 +1,10 @@
 package at.simcc.simcc_backend.db;
 
+import at.simcc.simcc_backend.entities.Trojan;
+import at.simcc.simcc_backend.entities.User;
+import at.simcc.simcc_backend.repo.TrojanRepository;
 import at.simcc.simcc_backend.entities.*;
 import at.simcc.simcc_backend.repo.InfectedRepository;
-import at.simcc.simcc_backend.repo.TrojanSessionRepository;
 import at.simcc.simcc_backend.repo.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +32,7 @@ import static at.simcc.simcc_backend.SimccBackendApplication.RANDOM;
 @Component
 @RequiredArgsConstructor
 public class DBManager implements ApplicationRunner {
-    private final TrojanSessionRepository trojanSessionRepo;
+    private final TrojanRepository trojanRepository;
     private final InfectedRepository infectedRepo;
     private final UserRepository userRepo;
 
@@ -45,15 +47,14 @@ public class DBManager implements ApplicationRunner {
                 .isAdmin(false)
                 .build();
 
-
-        byte[] ccidBytes = new byte[32];
-        RANDOM.nextBytes(ccidBytes);
-
-        TrojanSession trojanSession = TrojanSession.builder()
-                .ccid(Base64.getUrlEncoder().withoutPadding().encodeToString(ccidBytes))
+        Trojan trojan = Trojan.builder()
+                .name("Test")
                 .createdBy(user)
                 .build();
 
+        if (userRepo.getByUsername(user.getUsername()) == null) {
+            trojanRepository.save(trojan);
+        }
         Inet4Address ipAddressOne = (Inet4Address) Inet4Address.getByName("192.168.1.1");
 
         List<InfectedIP> infectedIPSOne = new ArrayList<>();
@@ -70,7 +71,7 @@ public class DBManager implements ApplicationRunner {
                 .infectedIPS(infectedIPSOne)
                 .build();
 
-        infectedIPSOne.get(0).setInfected(infectedOne);
+        infectedIPSOne.getFirst().setInfected(infectedOne);
 
         Inet4Address ipAddressTwo = (Inet4Address) Inet4Address.getByName("192.168.1.2");
 
@@ -88,14 +89,13 @@ public class DBManager implements ApplicationRunner {
                 .infectedIPS(infectedIPSTwo)
                 .build();
 
-        infectedIPSTwo.get(0).setInfected(infectedTwo);
+        infectedIPSTwo.getFirst().setInfected(infectedTwo);
 
         List<Infected> infects = new ArrayList<>();
         infects.add(infectedOne);
         infects.add(infectedTwo);
 
         infectedRepo.saveAll(infects);
-        trojanSessionRepo.save(trojanSession);
 
     }
 

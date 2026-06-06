@@ -1,13 +1,10 @@
 package at.simcc.simcc_backend.api.dal;
 
 import at.simcc.simcc_backend.entities.Infected;
-import at.simcc.simcc_backend.entities.TrojanSession;
 import at.simcc.simcc_backend.mapper.InfectedMapper;
-import at.simcc.simcc_backend.models.InfectedDto;
 import at.simcc.simcc_backend.models.InfectedIdDto;
-import at.simcc.simcc_backend.models.InfectedNoIdDto;
 import at.simcc.simcc_backend.repo.InfectedRepository;
-import at.simcc.simcc_backend.repo.TrojanSessionRepository;
+import at.simcc.simcc_backend.repo.TrojanRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class InfectedDal {
-    private final TrojanSessionRepository trojanSessionRepository;
+    private final TrojanRepository trojanRepository;
     private final InfectedRepository infectedRepository;
 
     private final InfectedMapper infectedMapper;
@@ -33,7 +30,7 @@ public class InfectedDal {
      * @throws EntityNotFoundException when the {@code ccid} was invalid
      */
     public InfectedIdDto registerInfected(String ccid) {
-        trojanSessionRepository.findTrojanSessionByCcid(ccid)
+        trojanRepository.findTrojanSessionByCcid(ccid)
                 .orElseThrow(EntityNotFoundException::new);
         Infected saved = infectedRepository.save(new Infected());
         InfectedIdDto dto = infectedMapper.toDtoId(saved);

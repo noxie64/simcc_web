@@ -2,21 +2,15 @@ package at.simcc.simcc_backend.api.service;
 
 import at.simcc.simcc_backend.api.dal.InfectedDal;
 import at.simcc.simcc_backend.entities.Infected;
-import at.simcc.simcc_backend.entities.TrojanSession;
 import at.simcc.simcc_backend.mapper.InfectedMapper;
 import at.simcc.simcc_backend.models.InfectedDto;
 import at.simcc.simcc_backend.models.InfectedIdDto;
-import at.simcc.simcc_backend.models.InfectedNoIdDto;
 import at.simcc.simcc_backend.repo.InfectedRepository;
-import at.simcc.simcc_backend.repo.TrojanSessionRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Project: SimCC-Backend
@@ -28,7 +22,6 @@ import java.util.Optional;
 public class InfectedService {
     private final InfectedDal infectedDal;
     private final InfectedRepository infectedRepo;
-    private final InfectedMapper mapper;
 
 
     public InfectedIdDto registerInfected(String ccid) {

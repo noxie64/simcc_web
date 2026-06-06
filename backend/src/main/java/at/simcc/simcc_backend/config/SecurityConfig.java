@@ -1,6 +1,5 @@
-package at.simcc.simcc_backend.security;
+package at.simcc.simcc_backend.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,7 +8,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 import java.util.List;
 
@@ -25,7 +23,6 @@ public class SecurityConfig {
     public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
 
     /**
      * Security rules applied:
@@ -54,6 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/infected/reg", "/error").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/trojan/**").permitAll()
                         .requestMatchers("/infected/allInfected").authenticated()
                         .anyRequest().authenticated()
                 )
