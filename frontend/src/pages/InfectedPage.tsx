@@ -12,9 +12,20 @@ export const InfectedPage: React.FC = () => {
     const [isLogedIn, setIsLogedIn] = useState(false);
     useTitle("InfectedPage");
 
+    /**
+     * If the user is not authenticated, he will be redirected to /login
+     */
     const obtainAllInfectedSystems = async () => {
-        const response = await api.get("/infected/allInfected");
-        setInfected(response.data as Infected[]);
+        try{
+            const response = await api.get("/infected/allInfected");
+            setInfected(response.data as Infected[]);
+        }catch (error){
+            localStorage.removeItem("isLoggedIn");
+
+            setTimeout(() => {
+                navigate("/login");
+            }, 3000);
+        }
     }
 
     const command = (infected: Infected) => {

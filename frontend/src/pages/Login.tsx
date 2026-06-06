@@ -22,23 +22,32 @@ export const Login: React.FC = () => {
         navigate("/");
     }
 
+    /**
+     * withCredentials -> tells the browser, that it is secure to send and obtain cookies
+     */
     const login = async () => {
-        const response = await api.get("/users/login-user", {params: {
-            email: email,
-            password: password
-        }});
+        try{
+            const response = await api.post("/users/login-user", {
+                email: email,
+                password: password
+            }, {withCredentials: true});
 
-        setPassword("");
-        setIsCredentialRight(response.data);
-        setIs2FA(response.data);
+            setPassword("");
+            setIsCredentialRight(response.data);
+            setIs2FA(response.data);
+        }catch (error) {
+            setPassword("");
+            setIsCredentialRight(false);
+            setIs2FA(false);
+        }
     }
 
     const verifyCode = async () => {
         if(code.length != 0){
-            const response = await api.get("/users/verify-2fa-after-login", {params: {
+            const response = await api.post("/users/verify-2fa-after-login", {
                     email: email,
                     code: code
-                }});
+            }, {withCredentials: true});
 
             if (response.data === true) {
                 localStorage.setItem("isLoggedIn", "true");
