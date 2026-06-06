@@ -48,15 +48,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/infected/**").permitAll()
+                        .requestMatchers("/infected/reg", "/error").permitAll()
                         .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/trojan/**").permitAll()
-                        .requestMatchers("/error").permitAll()
                         .requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/trojan/**").permitAll()
+                        .requestMatchers("/infected/allInfected").authenticated()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(basic -> basic.disable())
-                .formLogin(form -> form.disable());
+                .securityContext(context -> context.requireExplicitSave(false))
+                .logout(logout ->
+                        logout.logoutUrl("/users/logout")
+                                .invalidateHttpSession(true)
+                                .deleteCookies("JSESSIONID"));
 
         return http.build();
     }
@@ -68,7 +71,11 @@ public class SecurityConfig {
      * CORS rules applied:
      *  Allowed origin: http://localhost:5173
      *  Allowed methods: GET, POST, PUT, DELETE
-     *  Allowed headers: all headers are permitted
+     *  Allowed headers: Authorization,
+     *                 Content-Type,
+     *                 Connection,
+     *                 Upgrade,
+     *                 Cookie
      *  Applied to all endpoints:
      * @return
      */
@@ -78,12 +85,14 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowCredentials(true);
 
         config.setAllowedHeaders(List.of(
                 "Authorization",
                 "Content-Type",
                 "Connection",
-                "Upgrade"
+                "Upgrade",
+                "Cookie"
         ));
         return new UrlBasedCorsConfigurationSource(){{
            registerCorsConfiguration("/**", config);

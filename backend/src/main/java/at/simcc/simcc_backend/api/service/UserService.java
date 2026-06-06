@@ -16,6 +16,9 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +40,7 @@ import java.util.Map;
  */
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
     private static final String ISSUER = "SimCC";
     private final UserRepository userRepo;
     private final UserLoginDtoMapper userLoginAdminMapper;
@@ -139,7 +142,7 @@ public class UserService {
      * @param username the username associated with the account
      */
     public String getQRUrl(String username) {
-        User user = userRepo.getByUsername(username);
+        User user = userRepo.getByUsername(username).orElseThrow();
         String url = generateQRUrl(user.getTotpSecret(), user.getUsername());
 
         return url;
@@ -157,5 +160,11 @@ public class UserService {
         String rightPassword = user != null ?  user.getPassword() : "";
 
         return passwordEncoder.matches(password, rightPassword);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepo.getByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 }
