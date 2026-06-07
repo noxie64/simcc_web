@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
+import java.util.Set;
 
 /**
  * Project: backend
@@ -67,7 +68,11 @@ public class TrojanBuildService {
     }
 
     private void buildDockerImage() {
-
+        log.info("Building trojan docker-image...");
+        docker.buildImageCmd()
+                .withBaseDirectory(SimccConstants.TROJAN_DIR.toFile())
+                .withDockerfile(SimccConstants.TROJAN_DIR.resolve("Dockerfile").toFile())
+                .withTags(Set.of(simccConstants.getBuilder().getImageTag()));
 
     }
 }
