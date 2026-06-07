@@ -2,6 +2,9 @@ package at.simcc.simcc_backend.trojan_build;
 
 import at.simcc.simcc_backend.other.SimccConstants;
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.BuildImageResultCallback;
+import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.model.BuildResponseItem;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -47,13 +51,17 @@ public class TrojanBuildService {
         if (Files.exists(SimccConstants.TROJAN_DIR)) {
             trojanGitRepo = Git.open(SimccConstants.TROJAN_DIR.toFile());
             ObjectId oldHead = trojanGitRepo.getRepository().resolve("HEAD");
-            trojanGitRepo.fetch().call();
-            ObjectId fetchHead = trojanGitRepo.getRepository().resolve("FETCH_HEAD");
+            try {
+                trojanGitRepo.fetch().call();
+                ObjectId fetchHead = trojanGitRepo.getRepository().resolve("FETCH_HEAD");
 
-            if (!oldHead.equals(fetchHead)) {
-                log.info("Pulling changes from trojan upstream...");
-                trojanGitRepo.pull().call();
-                buildDockerImage();
+                if (!oldHead.equals(fetchHead)) {
+                    log.info("Pulling changes from trojan upstream...");
+                    trojanGitRepo.pull().call();
+                    buildDockerImage();
+                }
+            } catch (Exception e) {
+                log.error("Failed to look in trojan-repo for changes, using current state, not good!");
             }
         } else {
             trojanGitRepo = Git.cloneRepository()
@@ -65,6 +73,19 @@ public class TrojanBuildService {
         if (!Files.exists(SimccConstants.BUILD_DIR)) {
             Files.createDirectories(SimccConstants.BUILD_DIR);
         }
+
+        if (!doesImageExist()) {
+            buildDockerImage();
+        }
+    }
+
+    private boolean doesImageExist() {
+        try {
+            docker.inspectImageCmd(simccConstants.getBuilder().getImageTag()).exec();
+            return true;
+        } catch (NotFoundException e) {
+            return false;
+        }
     }
 
     private void buildDockerImage() {
@@ -72,7 +93,19 @@ public class TrojanBuildService {
         docker.buildImageCmd()
                 .withBaseDirectory(SimccConstants.TROJAN_DIR.toFile())
                 .withDockerfile(SimccConstants.TROJAN_DIR.resolve("Dockerfile").toFile())
-                .withTags(Set.of(simccConstants.getBuilder().getImageTag()));
+                .withTags(Set.of(simccConstants.getBuilder().getImageTag()))
+                .exec(new BuildImageResultCallback() {
+                    @Override
+                    public void onNext(BuildResponseItem item) {
+                        if (item.getStream() != null) {
+                            log.info("[docker build] {}", item.getStream().trim());
+                        }
+                    }
 
+                    @Override
+                    public void onComplete() {
+                        log.info("[docker build] {} build!", simccConstants.getBuilder().getImageTag());
+                    }
+                }).awaitImageId();
     }
 }
