@@ -52,7 +52,7 @@ public class DBManager implements ApplicationRunner {
                 .createdBy(user)
                 .build();
 
-        if (userRepo.getByUsername(user.getUsername()) == null) {
+        if (userRepo.getByUsername(user.getUsername()).isEmpty()) {
             trojanRepository.save(trojan);
         }
         Inet4Address ipAddressOne = (Inet4Address) Inet4Address.getByName("192.168.1.1");

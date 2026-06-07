@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Project: SimCC-Backend
@@ -24,7 +25,7 @@ public class InfectedService {
     private final InfectedRepository infectedRepo;
 
 
-    public InfectedIdDto registerInfected(String ccid) {
+    public InfectedIdDto registerInfected(UUID ccid) {
         return infectedDal.registerInfected(ccid);
     }
 

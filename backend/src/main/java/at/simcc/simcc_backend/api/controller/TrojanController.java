@@ -3,12 +3,20 @@ package at.simcc.simcc_backend.api.controller;
 import at.simcc.simcc_backend.api.body.TrojanCreationRequest;
 import at.simcc.simcc_backend.api.service.TrojanService;
 import at.simcc.simcc_backend.entities.User;
+import at.simcc.simcc_backend.mapper.TrojanMapper;
+import at.simcc.simcc_backend.models.TrojanPlainDto;
 import at.simcc.simcc_backend.repo.UserRepository;
+import at.simcc.simcc_backend.trojan_build.TrojanBuildService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Project: simcc_backend
@@ -22,11 +30,21 @@ import org.springframework.web.bind.annotation.*;
 public class TrojanController {
     private final TrojanService trojanService;
     private final UserRepository userRepo;
+    private final TrojanBuildService trojanBuildService;
+    private final TrojanMapper trojanMapper;
 
     @PostMapping("/create")
-    public void createTrojan(@Valid @RequestBody TrojanCreationRequest body) {
+    public ResponseEntity<TrojanPlainDto> createTrojan(@Valid @RequestBody TrojanCreationRequest body) {
         User user = userRepo.findUserByUserId(body.userId());
 
-        trojanService.createTrojan(body.name(), body.buildConfig(), user);
+        return ResponseEntity.ok(
+            trojanMapper.toDto(trojanService.createTrojan(body.name(), body.buildConfig(), user))
+        );
+    }
+
+    @PostMapping("/build/{ccid}")
+    public ResponseEntity<Void> triggerBuild(@PathVariable UUID ccid) {
+        trojanBuildService.buildTrojan(ccid);
+        return ResponseEntity.accepted().build();
     }
 }

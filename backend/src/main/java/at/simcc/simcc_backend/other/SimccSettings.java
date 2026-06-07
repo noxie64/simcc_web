@@ -17,7 +17,7 @@ import java.nio.file.Path;
 @Component
 @Data
 @ConfigurationProperties(prefix = "simcc")
-public class SimccConstants {
+public class SimccSettings {
     public static final Path DATA_DIR = Path.of("/simcc_data");
     public static final Path TROJAN_DIR = DATA_DIR.resolve("simcc_trojan");
     public static final Path BUILD_DIR = DATA_DIR.resolve("build");

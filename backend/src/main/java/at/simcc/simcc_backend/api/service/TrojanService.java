@@ -22,8 +22,7 @@ import java.util.Map;
 public class TrojanService {
     private final TrojanRepository trojanRepository;
 
-    public void createTrojan(String name, Map<TrojanSettingKey, Object> buildConfig, User user) {
-
+    public Trojan createTrojan(String name, Map<TrojanSettingKey, Object> buildConfig, User user) {
         List<TrojanSetting> trojanSettings = new ArrayList<>();
         for (TrojanSettingKey key : TrojanSettingKey.values()) {
 
@@ -51,6 +50,6 @@ public class TrojanService {
                 .build();
         trojan.getTrojanSettings().forEach(t -> t.setTrojan(trojan));
 
-        trojanRepository.save(trojan);
+        return trojanRepository.save(trojan);
     }
 }

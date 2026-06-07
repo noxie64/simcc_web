@@ -4,6 +4,7 @@ import at.simcc.simcc_backend.entities.Trojan;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Project: SimCC-Backend
@@ -12,5 +13,5 @@ import java.util.Optional;
  */
 public interface TrojanRepository extends JpaRepository<Trojan, Long> {
 
-    Optional<Trojan> findTrojanSessionByCcid(String ccid);
+    Optional<Trojan> findTrojanByCcid(UUID ccid);
 }

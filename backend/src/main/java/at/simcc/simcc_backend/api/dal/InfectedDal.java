@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 /**
  * Project: SimCC-Backend
  * Created by: Georg Kollegger
@@ -29,8 +31,8 @@ public class InfectedDal {
      * @param ccid a {@code ccid} used to check wether a valid trojan session is used
      * @throws EntityNotFoundException when the {@code ccid} was invalid
      */
-    public InfectedIdDto registerInfected(String ccid) {
-        trojanRepository.findTrojanSessionByCcid(ccid)
+    public InfectedIdDto registerInfected(UUID ccid) {
+        trojanRepository.findTrojanByCcid(ccid)
                 .orElseThrow(EntityNotFoundException::new);
         Infected saved = infectedRepository.save(new Infected());
         InfectedIdDto dto = infectedMapper.toDtoId(saved);

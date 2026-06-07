@@ -1,6 +1,6 @@
 package at.simcc.simcc_backend.config;
 
-import at.simcc.simcc_backend.other.SimccConstants;
+import at.simcc.simcc_backend.other.SimccSettings;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientImpl;
@@ -22,7 +22,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 @Slf4j
 public class DockerConfig {
-    private final SimccConstants simccConstants;
+    private final SimccSettings simccSettings;
 
     @Bean(destroyMethod = "close")
     public DockerClient docker() {
@@ -31,9 +31,9 @@ public class DockerConfig {
                         (System.getProperty("os.name").toLowerCase().contains("win")
                                 ? "npipe://%s"
                                 : "unix://%s"
-                        ).formatted(simccConstants.getDocker().getHost())
+                        ).formatted(simccSettings.getDocker().getHost())
                 )
-                .withDockerTlsVerify(simccConstants.getDocker().isTls())
+                .withDockerTlsVerify(simccSettings.getDocker().isTls())
                 .build();
 
         DockerHttpClient httpClient = new ApacheDockerHttpClient.Builder()

@@ -1,111 +1,94 @@
 package at.simcc.simcc_backend.trojan_build;
 
-import at.simcc.simcc_backend.other.SimccConstants;
+import at.simcc.simcc_backend.entities.Trojan;
+import at.simcc.simcc_backend.entities.TrojanBuild;
+import at.simcc.simcc_backend.other.SimccSettings;
+import at.simcc.simcc_backend.repo.TrojanRepository;
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.BuildImageResultCallback;
-import com.github.dockerjava.api.exception.NotFoundException;
-import com.github.dockerjava.api.model.BuildResponseItem;
-import com.github.dockerjava.core.DefaultDockerClientConfig;
-import com.github.dockerjava.core.DockerClientImpl;
-import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
-import com.github.dockerjava.transport.DockerHttpClient;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
+import com.github.dockerjava.api.async.ResultCallback;
+import com.github.dockerjava.api.command.WaitContainerResultCallback;
+import com.github.dockerjava.api.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.ObjectId;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.time.Duration;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Project: backend
  * Created by: Georg Kollegger
- * Date: 6/6/26
+ * Date: 6/7/26
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class TrojanBuildService {
-    private Git trojanGitRepo;
-    private final SimccConstants simccConstants;
     private final DockerClient docker;
+    private final TrojanRepository trojanRepo;
+    private final SimccSettings simccSettings;
 
-    @PostConstruct
-    public void init() throws IOException, GitAPIException {
-        setupDirectories();
-    }
+    public void buildTrojan(UUID ccid) {
+        Trojan trojan = trojanRepo.findTrojanByCcid(ccid).orElseThrow();
+        trojan.setBuilding(true);
 
-    private void setupDirectories() throws IOException, GitAPIException {
-        if (!Files.exists(SimccConstants.DATA_DIR)) {
-            Files.createDirectory(SimccConstants.DATA_DIR);
-        }
+        Thread.ofVirtual().start(() -> {
+            log.info("Building trojan {}!", ccid);
+            List<String> envs = trojan.getTrojanSettings().stream()
+                    .map(ts -> "%s=%s".formatted(ts.getKey(), ts.getValue()))
+                    .collect(Collectors.toList());
+            envs.add("CCID=%s".formatted(ccid));
 
-        if (Files.exists(SimccConstants.TROJAN_DIR)) {
-            trojanGitRepo = Git.open(SimccConstants.TROJAN_DIR.toFile());
-            ObjectId oldHead = trojanGitRepo.getRepository().resolve("HEAD");
+            TrojanBuild trojanBuild = TrojanBuild.builder()
+                    .buildId(UUID.randomUUID())
+                    .trojan(trojan)
+                    .build();
+
+            String containerId = docker.createContainerCmd(simccSettings.getBuilder().getImageTag())
+                    .withEnv(envs)
+                    .withCmd("sh", "-c",
+                            "cargo make win-build && cp target/x86_64-pc-windows-gnu/release/simcc_trojan.exe /out/%s.exe"
+                                    .formatted(trojanBuild.getBuildId())
+                    )
+                    .withHostConfig(HostConfig.newHostConfig()
+                            .withBinds(
+
+                                    new Bind("simcc_simcc-build-data", new Volume("/out"))
+                            )
+                    ).exec()
+                    .getId();
+
+            docker.startContainerCmd(containerId).exec();
+
             try {
-                trojanGitRepo.fetch().call();
-                ObjectId fetchHead = trojanGitRepo.getRepository().resolve("FETCH_HEAD");
-
-                if (!oldHead.equals(fetchHead)) {
-                    log.info("Pulling changes from trojan upstream...");
-                    trojanGitRepo.pull().call();
-                    buildDockerImage();
-                }
-            } catch (Exception e) {
-                log.error("Failed to look in trojan-repo for changes, using current state, not good!");
+                docker.logContainerCmd(containerId)
+                        .withStdOut(true)
+                        .withStdErr(true)
+                        .withFollowStream(true)
+                        .exec(new ResultCallback.Adapter<Frame>() {
+                            @Override
+                            public void onNext(Frame frame) {
+                                String line = new String(frame.getPayload()).trim();
+                                if (!line.isEmpty()) {
+                                    log.info("[cargo] {}", line);
+                                }
+                            }
+                }).awaitCompletion();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
-        } else {
-            trojanGitRepo = Git.cloneRepository()
-                    .setURI("https://github.com/noxie64/simcc_trojan")
-                    .setDirectory(SimccConstants.TROJAN_DIR.toFile())
-                    .call();
-        }
 
-        if (!Files.exists(SimccConstants.BUILD_DIR)) {
-            Files.createDirectories(SimccConstants.BUILD_DIR);
-        }
+            int exit = docker.waitContainerCmd(containerId)
+                    .exec(new WaitContainerResultCallback())
+                    .awaitStatusCode();
 
-        if (!doesImageExist()) {
-            buildDockerImage();
-        }
-    }
+            docker.removeContainerCmd(containerId).withForce(true).exec();
 
-    private boolean doesImageExist() {
-        try {
-            docker.inspectImageCmd(simccConstants.getBuilder().getImageTag()).exec();
-            return true;
-        } catch (NotFoundException e) {
-            return false;
-        }
-    }
-
-    private void buildDockerImage() {
-        log.info("Building trojan docker-image...");
-        docker.buildImageCmd()
-                .withBaseDirectory(SimccConstants.TROJAN_DIR.toFile())
-                .withDockerfile(SimccConstants.TROJAN_DIR.resolve("Dockerfile").toFile())
-                .withTags(Set.of(simccConstants.getBuilder().getImageTag()))
-                .exec(new BuildImageResultCallback() {
-                    @Override
-                    public void onNext(BuildResponseItem item) {
-                        if (item.getStream() != null) {
-                            log.info("[docker build] {}", item.getStream().trim());
-                        }
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        log.info("[docker build] {} build!", simccConstants.getBuilder().getImageTag());
-                    }
-                }).awaitImageId();
+            trojanBuild.setBuildAt(LocalDateTime.now());
+            log.info("Successfully build %s!".formatted(trojanBuild.getBuildId()));
+            if (exit != 0) throw new RuntimeException("Build failed for %s".formatted(ccid));
+        });
     }
 }
