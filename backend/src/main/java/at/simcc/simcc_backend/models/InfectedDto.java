@@ -1,6 +1,5 @@
 package at.simcc.simcc_backend.models;
 
-import at.simcc.simcc_backend.entities.OSType;
 import lombok.Builder;
 import lombok.Value;
 
@@ -15,8 +14,11 @@ import java.util.UUID;
 @Value
 public class InfectedDto implements Serializable {
     UUID iid;
-    OSType osType;
-    String osSubType;
-    String osInfo;
+    String osType;
+    String osVersion;
+    String osEdition;
+    String osCodeName;
+    String osBits;
+    String osArch;
     Inet4Address currentIpAddress;
 }

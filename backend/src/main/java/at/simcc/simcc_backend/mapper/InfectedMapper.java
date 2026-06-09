@@ -3,11 +3,8 @@ package at.simcc.simcc_backend.mapper;
 import at.simcc.simcc_backend.entities.Infected;
 import at.simcc.simcc_backend.models.InfectedDto;
 import at.simcc.simcc_backend.models.InfectedIdDto;
-import at.simcc.simcc_backend.models.InfectedNoIdDto;
-import org.mapstruct.BeanMapping;
+import at.simcc.simcc_backend.models.InfectedWithLatestIPDto;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 
@@ -28,4 +25,6 @@ public interface InfectedMapper {
     Infected toEntity(InfectedIdDto infectedIdDto);
 
     InfectedIdDto toDtoId(Infected infected);
+
+    InfectedWithLatestIPDto toInfectedWIthLatestIPDto(Infected infected);
 }
