@@ -1,0 +1,10 @@
+services:
+  traefik:
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.endpoint=npipe:////./pipe/docker_engine"
+    volumes:
+      - source: //./pipe/docker_engine
+        target: //./pipe/docker_engine
+        type: npipe
