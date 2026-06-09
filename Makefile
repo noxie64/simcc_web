@@ -1,11 +1,19 @@
+OS := $(shell uname -s 2>/dev/null || echo Windows)
+
+ifeq ($(OS), Windows)
+	COMPOSE = docker compose --env-file ./backend/.env -f compose.yml -f compose.windows.yml
+else
+	COMPOSE = docker compose --env-file ./backend/.env -f compose.yml -f compose.linux.yml
+endif
+
 up:
-	docker compose --env-file ./backend/.env up
+	$(COMPOSE) up
 
 up-build:
 	docker compose --env-file ./backend/.env up --build
 
 down:
-	docker compose --env-file ./backend/.env down
+	$(COMPOSE) down
 
 down-clean:
-	docker compose --env-file ./backend/.env down -v
+	$(COMPOSE) down -v
