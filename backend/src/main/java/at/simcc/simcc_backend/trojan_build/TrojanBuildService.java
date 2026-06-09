@@ -1,5 +1,9 @@
 package at.simcc.simcc_backend.trojan_build;
 
+import at.simcc.simcc_backend.api.controller.TrojanController;
+import at.simcc.simcc_backend.api.sse.BuildCompleteEvent;
+import at.simcc.simcc_backend.api.sse.BuildFailedEvent;
+import at.simcc.simcc_backend.api.sse.BuildSSEComponent;
 import at.simcc.simcc_backend.entities.Trojan;
 import at.simcc.simcc_backend.entities.TrojanBuild;
 import at.simcc.simcc_backend.other.SimccSettings;
@@ -29,6 +33,7 @@ public class TrojanBuildService {
     private final DockerClient docker;
     private final TrojanRepository trojanRepo;
     private final SimccSettings simccSettings;
+    private final BuildSSEComponent buildSSEComponent;
 
     public void buildTrojan(UUID ccid) {
         Trojan trojan = trojanRepo.findTrojanByCcid(ccid).orElseThrow();
@@ -86,9 +91,19 @@ public class TrojanBuildService {
 
             docker.removeContainerCmd(containerId).withForce(true).exec();
 
+
+            if (exit != 0) {
+                buildSSEComponent.publish(
+                        new BuildFailedEvent(ccid, "Failed to build trojan: %d".formatted(exit))
+                );
+                throw new RuntimeException("Build failed for %s".formatted(ccid));
+            }
+
             trojanBuild.setBuildAt(LocalDateTime.now());
             log.info("Successfully build %s!".formatted(trojanBuild.getBuildId()));
-            if (exit != 0) throw new RuntimeException("Build failed for %s".formatted(ccid));
+            buildSSEComponent.publish(
+                    new BuildCompleteEvent(ccid, "Trojan build!")
+            );
         });
     }
 }
