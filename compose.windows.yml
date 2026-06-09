@@ -5,6 +5,4 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.endpoint=npipe:////./pipe/docker_engine"
     volumes:
-      - source: //./pipe/docker_engine
-        target: //./pipe/docker_engine
-        type: npipe
+      - //./pipe/docker_engine://./pipe/docker_engine

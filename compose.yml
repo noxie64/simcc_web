@@ -101,7 +101,6 @@ services:
       - "traefik.http.routers.redis_insight.rule=PathPrefix(`/redis`)"
       - "traefik.http.services.redis_insight.loadbalancer.server.port=5540"
 
-
   traefik:
     image: traefik:v3.0
     command:
@@ -109,8 +108,7 @@ services:
       - "--providers.docker.exposedbydefault=false" 
     ports:
       - "7777:80"
-    volumes:
-      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock
+
 configs:
   pgadmin-servers:
     content: |
