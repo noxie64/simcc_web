@@ -34,10 +34,16 @@ public class Trojan {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    @Transient
+    private boolean building = false;
+
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
     @OneToMany(mappedBy = "trojan", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private List<TrojanSetting> trojanSettings;
+
+    @OneToMany(mappedBy = "trojan", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    private List<TrojanBuild> trojanBuilds;
 }

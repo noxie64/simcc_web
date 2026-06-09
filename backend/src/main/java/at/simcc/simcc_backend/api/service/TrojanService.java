@@ -1,21 +1,13 @@
 package at.simcc.simcc_backend.api.service;
 
-import at.simcc.simcc_backend.other.SimccConstants;
-import at.simcc.simcc_backend.other.TrojanBuildConfigDefaultProperties;
 import at.simcc.simcc_backend.entities.Trojan;
 import at.simcc.simcc_backend.entities.User;
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSetting;
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSettingKey;
 import at.simcc.simcc_backend.repo.TrojanRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.stereotype.Service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,32 +21,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TrojanService {
     private final TrojanRepository trojanRepository;
-    private final TrojanBuildConfigDefaultProperties buildConfigDefaults;
-    private Git trojanGitRepo;
 
-
-    @PostConstruct
-    public void init() throws IOException, GitAPIException {
-        if (!Files.exists(SimccConstants.DATA_DIR)) {
-            Files.createDirectory(SimccConstants.DATA_DIR);
-        }
-
-        if (Files.exists(SimccConstants.TROJAN_DIR)) {
-            trojanGitRepo = Git.open(SimccConstants.TROJAN_DIR.toFile());
-        } else {
-            trojanGitRepo = Git.cloneRepository()
-                    .setURI("https://github.com/noxie64/simcc_trojan")
-                    .setDirectory(SimccConstants.TROJAN_DIR.toFile())
-                    .call();
-        }
-
-        if (!Files.exists(SimccConstants.BUILD_DIR)) {
-            Files.createDirectories(SimccConstants.BUILD_DIR);
-        }
-    }
-
-    public void createTrojan(String name, Map<TrojanSettingKey, Object> buildConfig, User user) {
-
+    public Trojan createTrojan(String name, Map<TrojanSettingKey, Object> buildConfig, User user) {
         List<TrojanSetting> trojanSettings = new ArrayList<>();
         for (TrojanSettingKey key : TrojanSettingKey.values()) {
 
@@ -82,6 +50,6 @@ public class TrojanService {
                 .build();
         trojan.getTrojanSettings().forEach(t -> t.setTrojan(trojan));
 
-        trojanRepository.save(trojan);
+        return trojanRepository.save(trojan);
     }
 }

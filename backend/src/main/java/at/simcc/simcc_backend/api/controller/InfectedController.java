@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class InfectedController {
      * @return 200 OK with the newly set {@code iid}
      */
     @PostMapping("/reg")
-    public ResponseEntity<?> registerInfected(@RequestBody CCIDRequest ccidReq) {
+    public ResponseEntity<?> registerInfected(@Validated @RequestBody CCIDRequest ccidReq) {
 
         try {
             InfectedIdDto infectedId = infectedService.registerInfected(ccidReq.ccid());

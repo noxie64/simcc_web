@@ -21,7 +21,8 @@ services:
     volumes:
       - ./backend:/app
       - ~/.m2:/root/.m2
-      - ${SIMCC_DATA_MOUNT}:/simcc_data
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock
+      - simcc-build-data:/simcc_data/build
 
   frontend:
     depends_on:
@@ -131,3 +132,4 @@ volumes:
   pgadmin-store:
   redis_data:
   redisinsight-data:
+  simcc-build-data:
