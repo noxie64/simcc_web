@@ -3,6 +3,4 @@ services:
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.endpoint=npipe:////./pipe/docker_engine"
-    volumes:
-      - //./pipe/docker_engine://./pipe/docker_engine
+      - "--providers.docker.endpoint=tcp://host.docker.internal:2375"
