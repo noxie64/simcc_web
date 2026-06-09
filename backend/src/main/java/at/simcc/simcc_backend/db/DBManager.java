@@ -65,9 +65,9 @@ public class DBManager implements ApplicationRunner {
                 .build());
 
         Infected infectedOne = Infected.builder()
-                .osType(OSType.Windows)
-                .osSubType("11")
-                .osInfo("Up to dated")
+                .osType("Windumb")
+                .osVersion("11")
+                .osEdition("Up to dated")
                 .infectedIPS(infectedIPSOne)
                 .build();
 
@@ -83,9 +83,9 @@ public class DBManager implements ApplicationRunner {
                 .build());
 
         Infected infectedTwo = Infected.builder()
-                .osType(OSType.Windows)
-                .osSubType("7")
-                .osInfo("Forever young")
+                .osType("Windumb")
+                .osVersion("7")
+                .osEdition("Forever young")
                 .infectedIPS(infectedIPSTwo)
                 .build();
 

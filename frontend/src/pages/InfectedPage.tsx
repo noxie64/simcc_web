@@ -19,6 +19,7 @@ export const InfectedPage: React.FC = () => {
         try{
             const response = await api.get("/infected/allInfected");
             setInfected(response.data as Infected[]);
+            console.log(response.data)
         }catch (error){
             localStorage.removeItem("isLoggedIn");
 
@@ -29,7 +30,7 @@ export const InfectedPage: React.FC = () => {
     }
 
     const command = (infected: Infected) => {
-        console.log(infected.currentIpAddress);
+        console.log(infected.latestIpAddress);
     }
 
     /**

@@ -22,11 +22,19 @@ public class Infected {
     @Id
     @GeneratedValue
     private UUID iid;
-    @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    private OSType osType;
-    private String osSubType;
-    private String osInfo;
+
+
+    private String osType;
+    private String osVersion;
+    private String osEdition;
+    private String osCodeName;
+    private String osBits;
+    private String osArch;
+
+
+    @ManyToOne( cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "trojan")
+    private Trojan trojan;
 
     @OneToMany(mappedBy = "infected",
             cascade = {CascadeType.MERGE, CascadeType.PERSIST},

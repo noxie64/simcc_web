@@ -1,6 +1,5 @@
 package at.simcc.simcc_backend.models;
 
-import at.simcc.simcc_backend.entities.OSType;
 import lombok.Value;
 
 import java.io.Serializable;
@@ -10,7 +9,10 @@ import java.io.Serializable;
  */
 @Value
 public class InfectedNoIdDto implements Serializable {
-    OSType osType;
-    String osSubType;
-    String osInfo;
+    String osType;
+    String osVersion;
+    String osEdition;
+    String osCodeName;
+    String osBits;
+    String osArch;
 }

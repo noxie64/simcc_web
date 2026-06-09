@@ -46,4 +46,7 @@ public class Trojan {
 
     @OneToMany(mappedBy = "trojan", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
     private List<TrojanBuild> trojanBuilds;
+
+    @OneToMany(mappedBy = "trojan", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    private List<Infected> infectends;
 }
