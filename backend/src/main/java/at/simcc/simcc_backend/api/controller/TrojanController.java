@@ -14,6 +14,7 @@ import at.simcc.simcc_backend.trojan_build.TrojanBuildService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
@@ -23,6 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -54,7 +56,11 @@ public class TrojanController {
 
     @PostMapping("/build/{ccid}")
     public ResponseEntity<Void> triggerBuild(@PathVariable UUID ccid) {
-        trojanBuildService.buildTrojan(ccid);
+        try {
+            trojanBuildService.buildTrojan(ccid);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
         return ResponseEntity.accepted().build();
     }
 
