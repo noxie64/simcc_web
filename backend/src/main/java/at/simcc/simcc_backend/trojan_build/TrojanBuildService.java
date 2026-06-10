@@ -54,8 +54,8 @@ public class TrojanBuildService {
             String containerId = docker.createContainerCmd(simccSettings.getBuilder().getImageTag())
                     .withEnv(envs)
                     .withCmd("sh", "-c",
-                            "cargo make win-build && cp target/x86_64-pc-windows-gnu/release/simcc_trojan.exe /out/%s.exe"
-                                    .formatted(trojanBuild.getBuildId())
+                            "cargo make win-installer && cp target/%s.exe /out/%s.exe"
+                                    .formatted(ccid, trojanBuild.getBuildId())
                     )
                     .withHostConfig(HostConfig.newHostConfig()
                             .withBinds(
