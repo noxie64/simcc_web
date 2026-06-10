@@ -3,10 +3,10 @@ package at.simcc.simcc_backend.api.controller;
 import at.simcc.simcc_backend.api.body.TrojanCreationRequest;
 import at.simcc.simcc_backend.api.service.TrojanService;
 import at.simcc.simcc_backend.api.sse.BuildCompleteEvent;
-import at.simcc.simcc_backend.api.sse.BuildEvent;
 import at.simcc.simcc_backend.api.sse.BuildFailedEvent;
 import at.simcc.simcc_backend.api.sse.BuildSSEComponent;
 import at.simcc.simcc_backend.entities.User;
+import at.simcc.simcc_backend.entities.trojan_setting.TrojanSettingKey;
 import at.simcc.simcc_backend.mapper.TrojanMapper;
 import at.simcc.simcc_backend.models.TrojanPlainDto;
 import at.simcc.simcc_backend.repo.UserRepository;
@@ -19,14 +19,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Project: simcc_backend
@@ -62,6 +59,14 @@ public class TrojanController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.accepted().build();
+    }
+
+    @GetMapping(value = "/defaults/build")
+    public ResponseEntity<Map<TrojanSettingKey, Object>> buildDefaults() {
+        return ResponseEntity.ok(
+                Arrays.stream(TrojanSettingKey.values())
+                        .collect(Collectors.toMap(s -> s, s -> s.defaultValue))
+        );
     }
 
     @GetMapping(value = "/sse/build", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
