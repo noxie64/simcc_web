@@ -40,12 +40,23 @@ export default function Trojans() {
             <dialog ref={creatorModal} className="modal">
                 <div className="modal-box">
                     <h3 className="font-bold text-lg">Trojan-Creator</h3>
-
+                    <div className="mb-2">
+                        <h4 className="font-semibold">Name</h4>
+                        <input type="text" className="input focus:outline-1" placeholder="Trojan 01" />
+                    </div>
                     <dl className="grid grid-cols-[1fr_auto] gap-x-8 gap-y-1">
                         {Object.entries(buildSettings).map(([key, value]) => (
                             <>
                                 <dt key={`k-${key}`} className="font-semibold truncate">{key}</dt>
-                                <input type="text" placeholder={value}/>
+                                <input type={
+                                    (() => {
+                                        if (["number", "bingint"].includes(typeof(value))) {
+                                            return "number";
+                                        }
+
+                                        return "text";
+                                    })()
+                                } placeholder={value} className="input focus:outline-1"/>
                             </>
                         ))}
                     </dl>
