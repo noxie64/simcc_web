@@ -1,4 +1,7 @@
 services:
+  backend:
+    environment:
+      ON_WINDOWS: 1
   traefik:
     command:
       - "--providers.docker=true"

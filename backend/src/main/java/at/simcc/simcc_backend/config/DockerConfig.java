@@ -28,7 +28,7 @@ public class DockerConfig {
     public DockerClient docker() {
         DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(
-                        (System.getProperty("os.name").toLowerCase().contains("win")
+                        (System.getenv().containsKey("ON_WINDOWS")
                                 ? "tcp://host.docker.internal:2375"
                                 : "unix:///var/run/docker.sock"
                         )
