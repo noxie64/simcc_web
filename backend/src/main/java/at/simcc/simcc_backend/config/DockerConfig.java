@@ -30,8 +30,8 @@ public class DockerConfig {
                 .withDockerHost(
                         (System.getProperty("os.name").toLowerCase().contains("win")
                                 ? "tcp://host.docker.internal:2375"
-                                : "unix://%s"
-                        ).formatted(simccSettings.getDocker().getHost())
+                                : "unix:///var/run/docker.sock"
+                        )
                 )
                 .withDockerTlsVerify(simccSettings.getDocker().isTls())
                 .build();
