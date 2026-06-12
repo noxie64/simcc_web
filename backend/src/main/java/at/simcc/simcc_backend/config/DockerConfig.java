@@ -29,7 +29,7 @@ public class DockerConfig {
         DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(
                         (System.getProperty("os.name").toLowerCase().contains("win")
-                                ? "npipe://%s"
+                                ? "tcp://host.docker.internal:2375"
                                 : "unix://%s"
                         ).formatted(simccSettings.getDocker().getHost())
                 )
