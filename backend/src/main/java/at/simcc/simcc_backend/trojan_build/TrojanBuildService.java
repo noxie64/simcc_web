@@ -1,12 +1,12 @@
 package at.simcc.simcc_backend.trojan_build;
 
-import at.simcc.simcc_backend.api.controller.TrojanController;
 import at.simcc.simcc_backend.api.sse.BuildCompleteEvent;
 import at.simcc.simcc_backend.api.sse.BuildFailedEvent;
 import at.simcc.simcc_backend.api.sse.BuildSSEComponent;
 import at.simcc.simcc_backend.entities.Trojan;
 import at.simcc.simcc_backend.entities.TrojanBuild;
 import at.simcc.simcc_backend.other.SimccSettings;
+import at.simcc.simcc_backend.repo.TrojanBuildRepository;
 import at.simcc.simcc_backend.repo.TrojanRepository;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
@@ -36,6 +36,7 @@ public class TrojanBuildService {
     private final SimccSettings simccSettings;
     private final BuildSSEComponent buildSSEComponent;
     private static final List<UUID> building = new ArrayList<>();
+    private final TrojanBuildRepository trojanBuildRepo;
 
     public boolean isBuilding(UUID ccid) {
         return building.contains(ccid);
@@ -110,6 +111,7 @@ public class TrojanBuildService {
 
             trojanBuild.setBuildAt(LocalDateTime.now());
             log.info("Successfully build %s!".formatted(trojanBuild.getBuildId()));
+            trojanBuildRepo.save(trojanBuild);
             building.remove(ccid);
             buildSSEComponent.publish(
                     new BuildCompleteEvent(ccid, "Trojan build!")

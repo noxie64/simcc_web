@@ -15,13 +15,7 @@ export default function Trojans() {
     const creatorModalRef: any = useRef(null);
     const [buildSettings, setBuildSettings] = useState<Record<string, FilledTrojanSetting>>({});
     const [name, setName] = useState<string>('');
-    const [trojans, setTrojans] = useState<Trojan[]>([
-        {
-            ccid: 'ae71fb45-230f-4dc5-ab91-a2ab94b18724',
-            name: 'Cool trojan',
-            lastBuilt: dayjs()
-        }
-    ]);
+    const [trojans, setTrojans] = useState<Trojan[]>([]);
 
     const loadSettings = async () => {
         const response = await api.get("/trojan/defaults/build");
@@ -41,7 +35,14 @@ export default function Trojans() {
     const loadTrojans = async () => {
         const res = await api.get("/trojan/");
         console.log(res.data);
-        setTrojans(await res.data);
+        setTrojans(
+            (await res.data as Trojan[]).map((trojan: Trojan) => ({
+                ...trojan,
+                lastBuilt: trojan.lastBuilt
+                    ? dayjs(trojan.lastBuilt)
+                    : null
+            }))
+        );
     }
 
     const handleModalClose = () => {
@@ -59,7 +60,7 @@ export default function Trojans() {
     }
 
     const handleCreate = async () => {
-        const _ = await api.post('/trojan/create', {
+        await api.post('/trojan/create', {
             name,
             buildConfig: Object.fromEntries(
                 Object.entries(buildSettings)
@@ -71,16 +72,27 @@ export default function Trojans() {
         await loadTrojans();
     }
 
+    const handleBuild = async (ccid: string) => {
+        setTrojans(prev => prev.map(trojan =>
+            trojan.ccid === ccid ? { ...trojan, building: true } : trojan
+        ));
+        await api.post(`/trojan/build/${ccid}`);
+    }
+
     useEffect(() => {
         const sse = new EventSource("/api/trojan/sse/build");
         sse.addEventListener("build.completed", (e) => {
             const data = JSON.parse(e.data);
-            console.log("Build complete:", data.buildId, data.message);
+            console.log("Build complete:", data.ccid, data.message);
+            setTrojans(prev => prev.map(trojan => trojan.ccid == data.ccid
+                ? { ...trojan, building: false, lastBuilt: dayjs() }
+                : trojan
+            ));
         });
 
         sse.addEventListener("build.failed", (e) => {
             const data = JSON.parse(e.data);
-            console.error("Build failed:", data.buildId, data.error);
+            console.error("Build failed:", data.ccid, data.message);
         });
 
         sse.onopen = () => console.log("SSE connected");
@@ -104,9 +116,13 @@ export default function Trojans() {
             <div>
                 <button className="btn btn-primary" onClick={() => creatorModalRef.current.showModal()}>Add</button>
             </div>
-            <div className="pt-3 pb-3">
+            <div className="flex flex-col pt-3 pb-3 gap-2">
                 {
-                    trojans.map(trojan => <TrojanListItem building trojan={trojan} key={trojan.ccid} />)
+                    trojans.map(trojan => <TrojanListItem
+                        trojan={trojan}
+                        key={trojan.ccid}
+                        handleBuild={() => handleBuild(trojan.ccid)}
+                    />)
                 }
             </div>
             <dialog ref={creatorModalRef} className="modal">
