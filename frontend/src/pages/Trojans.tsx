@@ -52,8 +52,18 @@ export default function Trojans() {
         ));
     }
 
-    const handleCreate = () => {
+    const handleCreate = async () => {
+        const res = await api.post('/trojan/create', {
+            name,
+            buildConfig: Object.fromEntries(
+                Object.entries(buildSettings)
+                    .filter(([_, value]: [string, FilledTrojanSetting]) => value.value != '')
+                    .map(([key, value]: [string, FilledTrojanSetting]) => [
+                        key, value.value
+                    ]))
+        });
 
+        console.log(res.data);
     }
 
     useEffect(() => {
@@ -90,7 +100,7 @@ export default function Trojans() {
             </div>
             <div className="pt-3 pb-3">
                 {
-                    trojans.map(trojan => <TrojanListItem building trojan={trojan} />)
+                    trojans.map(trojan => <TrojanListItem building trojan={trojan} key={trojan.ccid} />)
                 }
             </div>
             <dialog ref={creatorModalRef} className="modal">

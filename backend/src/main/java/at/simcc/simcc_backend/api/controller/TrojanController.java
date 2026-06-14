@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import tools.jackson.databind.ObjectMapper;
@@ -43,9 +44,7 @@ public class TrojanController {
     private final BuildSSEComponent buildSSEComponent;
 
     @PostMapping("/create")
-    public ResponseEntity<TrojanPlainDto> createTrojan(@Valid @RequestBody TrojanCreationRequest body) {
-        User user = userRepo.findUserByUserId(body.userId());
-
+    public ResponseEntity<TrojanPlainDto> createTrojan(@Valid @RequestBody TrojanCreationRequest body, @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(
             trojanMapper.toDto(trojanService.createTrojan(body.name(), body.buildConfig(), user))
         );

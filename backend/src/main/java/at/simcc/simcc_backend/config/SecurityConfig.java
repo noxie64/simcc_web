@@ -51,7 +51,7 @@ public class SecurityConfig {
                         .requestMatchers("/infected/reg", "/error").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
-                        .requestMatchers("/trojan/**").permitAll()
+                        .requestMatchers("/trojan/**").authenticated()
                         .requestMatchers("/infected/allInfected").authenticated()
                         .anyRequest().authenticated()
                 )

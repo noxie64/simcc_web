@@ -6,6 +6,7 @@ import at.simcc.simcc_backend.entities.trojan_setting.TrojanSetting;
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSettingKey;
 import at.simcc.simcc_backend.repo.TrojanRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

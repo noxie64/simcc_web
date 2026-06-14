@@ -37,7 +37,7 @@ public class Trojan {
     @Transient
     private boolean building = false;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
