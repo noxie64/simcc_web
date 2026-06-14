@@ -10,7 +10,7 @@ up:
 	$(COMPOSE) up
 
 up-build:
-	docker compose --env-file ./backend/.env up --build
+	$(COMPOSE) up --build
 
 down:
 	$(COMPOSE) down

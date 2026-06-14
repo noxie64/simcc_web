@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useTitle } from "../hooks/useTitle";
 import api from "../api/baseUrl";
+import { type Trojan } from "../types/trojan";
+import TrojanListItem from "../components/TrojanListItem";
+import dayjs from "dayjs";
 
 interface FilledTrojanSetting {
     defaultValue: any,
@@ -12,6 +15,13 @@ export default function Trojans() {
     const creatorModalRef: any = useRef(null);
     const [buildSettings, setBuildSettings] = useState<Record<string, FilledTrojanSetting>>({});
     const [name, setName] = useState<string>('');
+    const [trojans, setTrojans] = useState<Trojan[]>([
+        {
+            ccid: 'ae71fb45-230f-4dc5-ab91-a2ab94b18724',
+            name: 'Cool trojan',
+            lastBuilt: dayjs()
+        }
+    ]);
 
     const loadSettings = async () => {
         const response = await api.get("/trojan/defaults/build");
@@ -77,6 +87,11 @@ export default function Trojans() {
         <div className="flex flex-col p-4">
             <div>
                 <button className="btn btn-primary" onClick={() => creatorModalRef.current.showModal()}>Add</button>
+            </div>
+            <div className="pt-3 pb-3">
+                {
+                    trojans.map(trojan => <TrojanListItem building trojan={trojan} />)
+                }
             </div>
             <dialog ref={creatorModalRef} className="modal">
                 <div className="modal-box">
