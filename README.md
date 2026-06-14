@@ -17,7 +17,7 @@ make up
 Since both the backend itself and out reverse-proxy [traefik](https://hub.docker.com/_/traefik/) must communicate with docker, running it on windows is slightly different.
 First, enable the tcp-passthorugh to the docker-daemon in Docker Desktop like explained [here](https://docs.docker.com/desktop/settings-and-maintenance/settings/).
 ![Docker-Desktop setting to enable tcp](./win-setting.png)  
-TL;DR, use wsl with Docker Desktop like explained [here](https://docs.docker.com/desktop/features/wsl/).
+TL;DR, use wsl with Docker Desktop like explained [here](https://docs.docker.com/desktop/features/wsl/) if you want to save yourself from the headache.
 
 ### URLs
 - 📝 PGAdmin: [http://localhost:7777/pgadmin](http://localhost:7777/pgadmin)
