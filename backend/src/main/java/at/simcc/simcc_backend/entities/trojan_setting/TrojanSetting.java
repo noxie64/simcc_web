@@ -2,10 +2,7 @@ package at.simcc.simcc_backend.entities.trojan_setting;
 
 import at.simcc.simcc_backend.entities.Trojan;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Struct;
 import org.hibernate.type.SqlTypes;
@@ -24,6 +21,7 @@ import org.hibernate.type.SqlTypes;
 public class TrojanSetting {
     @Id
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @ToString.Exclude
     @JoinColumn(name = "trojan_id")
     private Trojan trojan;
     @Id

@@ -103,7 +103,7 @@ services:
       - "traefik.http.services.redis_insight.loadbalancer.server.port=5540"
 
   traefik:
-    image: traefik:v3.0
+    image: traefik:v3.7.5
     command:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false" 

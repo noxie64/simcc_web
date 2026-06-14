@@ -2,10 +2,7 @@ package at.simcc.simcc_backend.entities;
 
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSetting;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -28,5 +25,6 @@ public class TrojanBuild {
     private LocalDateTime buildAt;
 
     @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE }, fetch = FetchType.EAGER)
+    @ToString.Exclude
     private Trojan trojan;
 }

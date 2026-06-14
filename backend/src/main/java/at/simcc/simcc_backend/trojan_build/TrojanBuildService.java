@@ -1,12 +1,12 @@
 package at.simcc.simcc_backend.trojan_build;
 
-import at.simcc.simcc_backend.api.controller.TrojanController;
 import at.simcc.simcc_backend.api.sse.BuildCompleteEvent;
 import at.simcc.simcc_backend.api.sse.BuildFailedEvent;
 import at.simcc.simcc_backend.api.sse.BuildSSEComponent;
 import at.simcc.simcc_backend.entities.Trojan;
 import at.simcc.simcc_backend.entities.TrojanBuild;
 import at.simcc.simcc_backend.other.SimccSettings;
+import at.simcc.simcc_backend.repo.TrojanBuildRepository;
 import at.simcc.simcc_backend.repo.TrojanRepository;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,8 +35,15 @@ public class TrojanBuildService {
     private final TrojanRepository trojanRepo;
     private final SimccSettings simccSettings;
     private final BuildSSEComponent buildSSEComponent;
+    private static final List<UUID> building = new ArrayList<>();
+    private final TrojanBuildRepository trojanBuildRepo;
+
+    public boolean isBuilding(UUID ccid) {
+        return building.contains(ccid);
+    }
 
     public void buildTrojan(UUID ccid) {
+        building.add(ccid);
         Trojan trojan = trojanRepo.findTrojanByCcid(ccid).orElseThrow();
         trojan.setBuilding(true);
 
@@ -82,6 +90,7 @@ public class TrojanBuildService {
                             }
                 }).awaitCompletion();
             } catch (InterruptedException e) {
+                building.remove(ccid);
                 throw new RuntimeException(e);
             }
 
@@ -96,11 +105,14 @@ public class TrojanBuildService {
                 buildSSEComponent.publish(
                         new BuildFailedEvent(ccid, "Failed to build trojan: %d".formatted(exit))
                 );
+                building.remove(ccid);
                 throw new RuntimeException("Build failed for %s".formatted(ccid));
             }
 
             trojanBuild.setBuildAt(LocalDateTime.now());
             log.info("Successfully build %s!".formatted(trojanBuild.getBuildId()));
+            trojanBuildRepo.save(trojanBuild);
+            building.remove(ccid);
             buildSSEComponent.publish(
                     new BuildCompleteEvent(ccid, "Trojan build!")
             );

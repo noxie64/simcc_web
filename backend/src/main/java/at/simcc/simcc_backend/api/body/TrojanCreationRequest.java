@@ -15,9 +15,7 @@ public record TrojanCreationRequest(
         String name,
 
         @TrojanBuildConfigConstraint
-        Map<TrojanSettingKey, Object> buildConfig,
-        // MUST BE REMOVED AS SOON AS REAL AUTH IS IN PLACE
-        @NotNull
-        Long userId
+        Map<TrojanSettingKey, Object> buildConfig
+
 ) {
 }
