@@ -34,6 +34,7 @@ public class Infected {
 
     @ManyToOne( cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     @JoinColumn(name = "trojan")
+    @ToString.Exclude
     private Trojan trojan;
 
     @OneToMany(mappedBy = "infected",

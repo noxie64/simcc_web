@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,8 +35,14 @@ public class TrojanBuildService {
     private final TrojanRepository trojanRepo;
     private final SimccSettings simccSettings;
     private final BuildSSEComponent buildSSEComponent;
+    private static final List<UUID> building = new ArrayList<>();
+
+    public boolean isBuilding(UUID ccid) {
+        return building.contains(ccid);
+    }
 
     public void buildTrojan(UUID ccid) {
+        building.add(ccid);
         Trojan trojan = trojanRepo.findTrojanByCcid(ccid).orElseThrow();
         trojan.setBuilding(true);
 
@@ -82,6 +89,7 @@ public class TrojanBuildService {
                             }
                 }).awaitCompletion();
             } catch (InterruptedException e) {
+                building.remove(ccid);
                 throw new RuntimeException(e);
             }
 
@@ -96,11 +104,13 @@ public class TrojanBuildService {
                 buildSSEComponent.publish(
                         new BuildFailedEvent(ccid, "Failed to build trojan: %d".formatted(exit))
                 );
+                building.remove(ccid);
                 throw new RuntimeException("Build failed for %s".formatted(ccid));
             }
 
             trojanBuild.setBuildAt(LocalDateTime.now());
             log.info("Successfully build %s!".formatted(trojanBuild.getBuildId()));
+            building.remove(ccid);
             buildSSEComponent.publish(
                     new BuildCompleteEvent(ccid, "Trojan build!")
             );

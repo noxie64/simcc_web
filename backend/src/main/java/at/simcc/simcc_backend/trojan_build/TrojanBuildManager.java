@@ -1,5 +1,6 @@
 package at.simcc.simcc_backend.trojan_build;
 
+import at.simcc.simcc_backend.entities.Trojan;
 import at.simcc.simcc_backend.other.SimccSettings;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.BuildImageResultCallback;
@@ -15,7 +16,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Project: backend
@@ -34,6 +38,7 @@ public class TrojanBuildManager {
     public void init() throws IOException, GitAPIException, InterruptedException {
         setupDirectories();
     }
+
 
     private void setupDirectories() throws IOException, GitAPIException, InterruptedException {
         if (!Files.exists(SimccSettings.DATA_DIR)) {

@@ -2,10 +2,7 @@ package at.simcc.simcc_backend.entities;
 
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSetting;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -38,6 +35,7 @@ public class Trojan {
     private boolean building = false;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @ToString.Exclude
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 

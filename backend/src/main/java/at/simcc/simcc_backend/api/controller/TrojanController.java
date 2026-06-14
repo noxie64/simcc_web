@@ -5,10 +5,13 @@ import at.simcc.simcc_backend.api.service.TrojanService;
 import at.simcc.simcc_backend.api.sse.BuildCompleteEvent;
 import at.simcc.simcc_backend.api.sse.BuildFailedEvent;
 import at.simcc.simcc_backend.api.sse.BuildSSEComponent;
+import at.simcc.simcc_backend.entities.Trojan;
 import at.simcc.simcc_backend.entities.User;
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSettingKey;
 import at.simcc.simcc_backend.mapper.TrojanMapper;
+import at.simcc.simcc_backend.models.TrojanDisplayDto;
 import at.simcc.simcc_backend.models.TrojanPlainDto;
+import at.simcc.simcc_backend.repo.TrojanRepository;
 import at.simcc.simcc_backend.repo.UserRepository;
 import at.simcc.simcc_backend.trojan_build.TrojanBuildService;
 import jakarta.validation.Valid;
@@ -39,14 +42,29 @@ public class TrojanController {
     private final TrojanService trojanService;
     private final UserRepository userRepo;
     private final TrojanBuildService trojanBuildService;
-    private final TrojanMapper trojanMapper;
     private final ObjectMapper objMapper;
     private final BuildSSEComponent buildSSEComponent;
+    private final TrojanRepository trojanRepo;
+    private final TrojanMapper trojanMapper;
 
     @PostMapping("/create")
-    public ResponseEntity<TrojanPlainDto> createTrojan(@Valid @RequestBody TrojanCreationRequest body, @AuthenticationPrincipal User user) {
+    public ResponseEntity<TrojanDisplayDto> createTrojan(@Valid @RequestBody TrojanCreationRequest body, @AuthenticationPrincipal User user) {
+        Trojan trojan = trojanService.createTrojan(body.name(), body.buildConfig(), user);
+
         return ResponseEntity.ok(
-            trojanMapper.toDto(trojanService.createTrojan(body.name(), body.buildConfig(), user))
+                new TrojanDisplayDto(
+                        trojan.getCcid(),
+                        trojan.getName(),
+                        null,
+                        false
+                )
+        );
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<TrojanDisplayDto>> listAllTrojans(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(
+                trojanService.loadAllTrojans(user)
         );
     }
 

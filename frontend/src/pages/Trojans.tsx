@@ -38,6 +38,12 @@ export default function Trojans() {
         ));
     }
 
+    const loadTrojans = async () => {
+        const res = await api.get("/trojan/");
+        console.log(res.data);
+        setTrojans(await res.data);
+    }
+
     const handleModalClose = () => {
         setName('');
         setBuildSettings(prev => Object.fromEntries(
@@ -53,7 +59,7 @@ export default function Trojans() {
     }
 
     const handleCreate = async () => {
-        const res = await api.post('/trojan/create', {
+        const _ = await api.post('/trojan/create', {
             name,
             buildConfig: Object.fromEntries(
                 Object.entries(buildSettings)
@@ -62,8 +68,7 @@ export default function Trojans() {
                         key, value.value
                     ]))
         });
-
-        console.log(res.data);
+        await loadTrojans();
     }
 
     useEffect(() => {
@@ -82,6 +87,7 @@ export default function Trojans() {
         sse.onerror = (e) => console.error("SSE error", e);
 
         loadSettings();
+        loadTrojans();
 
         creatorModalRef.current.addEventListener('close', handleModalClose)
 

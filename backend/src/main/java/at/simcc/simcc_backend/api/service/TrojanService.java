@@ -4,7 +4,9 @@ import at.simcc.simcc_backend.entities.Trojan;
 import at.simcc.simcc_backend.entities.User;
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSetting;
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSettingKey;
+import at.simcc.simcc_backend.models.TrojanDisplayDto;
 import at.simcc.simcc_backend.repo.TrojanRepository;
+import at.simcc.simcc_backend.trojan_build.TrojanBuildService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TrojanService {
     private final TrojanRepository trojanRepository;
+    private final TrojanBuildService trojanBuildService;
 
     public Trojan createTrojan(String name, Map<TrojanSettingKey, Object> buildConfig, User user) {
         List<TrojanSetting> trojanSettings = new ArrayList<>();
@@ -52,5 +55,12 @@ public class TrojanService {
         trojan.getTrojanSettings().forEach(t -> t.setTrojan(trojan));
 
         return trojanRepository.save(trojan);
+    }
+
+    public List<TrojanDisplayDto> loadAllTrojans(User user) {
+        return trojanRepository.findTrojansForDisplay(user)
+                .stream()
+                .peek(t -> t.setBuilding(trojanBuildService.isBuilding(t.getCcid())))
+                .toList();
     }
 }
