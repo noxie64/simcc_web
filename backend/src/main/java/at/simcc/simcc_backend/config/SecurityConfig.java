@@ -1,6 +1,5 @@
-package at.simcc.simcc_backend.security;
+package at.simcc.simcc_backend.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,7 +8,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 import java.util.List;
 
@@ -26,20 +24,17 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Value("${simcc.domain}")
-    private String SIMCC_DOMAIN;
-
     /**
      * Security rules applied:
      *  CSRF protection is disabled (stateless REST API)
      *  CORS is configured via {@link #corsConfigurationSource()}
      *  Public endpoints:
-     *      POST /api/users/reg,
-     *      GET /api/users/check-if-exist,
-     *      GET /api/users/obtain-qr-url,
-     *      GET /api/users/verify-2fa,
-     *      GET /api/users/login-user,
-     *      GET /api/users/verify-2fa-after-login
+     *      POST /users/reg,
+     *      GET /users/check-if-exist,
+     *      GET /users/obtain-qr-url,
+     *      GET /users/verify-2fa,
+     *      GET /users/login-user,
+     *      GET /users/verify-2fa-after-login
      *  All other endpoints require authentication
      *  HTTP Basic and form-based login are disabled
      * @param http -> is used for setting all http configurations
@@ -53,23 +48,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers("/api/users/reg", "/api/users/check-if-exist").permitAll()
-                        .requestMatchers("/api/infected/reg").permitAll()
+                        .requestMatchers("/infected/reg", "/error").permitAll()
                         .requestMatchers("/ws/**").permitAll()
-                        .requestMatchers("/error").permitAll()
-                        .requestMatchers(
-                                "/api/users/reg",
-                                "/api/users/check-if-exist",
-                                "/api/users/obtain-qr-url",
-                                "/api/users/verify-2fa",
-                                "/api/users/login-user",
-                                "/api/users/verify-2fa-after-login"
-                        ).permitAll()
+                        .requestMatchers("/users/**").permitAll()
+                        .requestMatchers("/trojan/**").authenticated()
+                        .requestMatchers("/infected/allInfected").authenticated()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(basic -> basic.disable())
-                .formLogin(form -> form.disable());
+                .securityContext(context -> context.requireExplicitSave(false))
+                .logout(logout ->
+                        logout.logoutUrl("/users/logout")
+                                .invalidateHttpSession(true)
+                                .deleteCookies("JSESSIONID"));
 
         return http.build();
     }
@@ -81,7 +71,11 @@ public class SecurityConfig {
      * CORS rules applied:
      *  Allowed origin: http://localhost:5173
      *  Allowed methods: GET, POST, PUT, DELETE
-     *  Allowed headers: all headers are permitted
+     *  Allowed headers: Authorization,
+     *                 Content-Type,
+     *                 Connection,
+     *                 Upgrade,
+     *                 Cookie
      *  Applied to all endpoints:
      * @return
      */
@@ -91,12 +85,14 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowCredentials(true);
 
         config.setAllowedHeaders(List.of(
                 "Authorization",
                 "Content-Type",
                 "Connection",
-                "Upgrade"
+                "Upgrade",
+                "Cookie"
         ));
         return new UrlBasedCorsConfigurationSource(){{
            registerCorsConfiguration("/**", config);

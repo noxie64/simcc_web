@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from "react"
 import api from "../api/baseUrl.ts";
 import {useNavigate} from "react-router";
+import { useTitle } from "../hooks/useTitle.ts";
 
 export const Initialization: React.FC = () => {
+    useTitle("Setup");
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -31,7 +33,7 @@ export const Initialization: React.FC = () => {
             try{
                 const response = await api.get("/users/check-if-exist");
                 if (response.data === true){
-                    navigate("/");
+                    navigate("/login");
                 }
             }catch (e) {
                 console.log("Error: " + e);

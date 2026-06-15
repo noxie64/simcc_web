@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from "react"
 import {useLocation, useNavigate} from "react-router";
 import api from "../api/baseUrl.ts";
+import { useTitle } from "../hooks/useTitle.ts";
 export const TwoFA: React.FC = () => {
+    useTitle("2FA")
     const [code, setCode] = useState<number>();
     const [isVerified, setIsVerified] = useState<boolean>();
     const [url, setUrl] = useState<string>();

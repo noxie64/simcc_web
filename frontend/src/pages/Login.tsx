@@ -1,8 +1,10 @@
 import React, {useEffect, useState} from "react"
 import {useNavigate} from "react-router";
 import api from "../api/baseUrl.ts";
+import { useTitle } from "../hooks/useTitle.ts";
 
 export const Login: React.FC = () => {
+    useTitle("Login");
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const navigate = useNavigate();
@@ -17,28 +19,42 @@ export const Login: React.FC = () => {
     const [code, setCode] = useState<string>("");
 
     const forgotPassword = () => {
-        navigate("/dummy");
+        navigate("/");
     }
 
+    /**
+     * withCredentials -> tells the browser, that it is secure to send and obtain cookies
+     */
     const login = async () => {
-        const response = await api.get("/users/login-user", {params: {
-            email: email,
-            password: password
-        }});
+        try{
+            const response = await api.post("/users/login-user", {
+                email: email,
+                password: password
+            }, {withCredentials: true});
 
-        setPassword("");
-        setIsCredentialRight(response.data);
-        setIs2FA(response.data);
+            setPassword("");
+            setIsCredentialRight(response.data);
+            setIs2FA(response.data);
+        }catch (error) {
+            setPassword("");
+            setIsCredentialRight(false);
+            setIs2FA(false);
+        }
     }
 
     const verifyCode = async () => {
         if(code.length != 0){
-            const response = await api.get("/users/verify-2fa-after-login", {params: {
+            const response = await api.post("/users/verify-2fa-after-login", {
                     email: email,
                     code: code
-                }});
+            }, {withCredentials: true});
 
-            setIsValid(response.data);
+            if (response.data === true) {
+                localStorage.setItem("isLoggedIn", "true");
+                navigate("/infected");
+            } else {
+                setIsValid(false);
+            }
         }
         else {
             setIsValid(false);
@@ -47,7 +63,7 @@ export const Login: React.FC = () => {
 
     useEffect(()=>{
         if(isValid){
-            navigate("/dummy");
+            navigate("/infected", {state : true});
         }
     }, [isValid])
 

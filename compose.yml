@@ -1,21 +1,45 @@
 name: simcc
 
 services:
-  app-dev:
+  backend:
     depends_on:
-      - postgres
       - pgadmin
+      - redisinsight
     build:
       context: backend/
       target: dev
     env_file:
       - "backend/.env"
+    expose:
+      - "8080"
     ports:
-      - "8080:8080" # web
-      - "5005:5005" # debug
+      - "5005:5005"
+    labels:
+      - "traefik.enable=true" 
+      - "traefik.http.routers.simcc-backend.rule=PathPrefix(`/api`)"
+      - "traefik.http.services.simcc-backend.loadbalancer.server.port=8080"
     volumes:
-      - ./backend:/app # live source mount
+      - ./backend:/app
       - ~/.m2:/root/.m2
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock
+      - simcc-build-data:/simcc_data/build
+
+  frontend:
+    depends_on:
+      - traefik
+      - backend
+    build:
+      context: frontend/
+      target: dev
+    expose:
+      - "5173"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.simcc-frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.services.simcc-frontend.loadbalancer.server.port=5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
   postgres:
     image: postgres:16
     restart: unless-stopped
@@ -26,18 +50,66 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     restart: unless-stopped
-    ports:
-      - "5050:80"
-    env_file:
-      - "backend/.env"
-    volumes:
-      - pgadmin-store:/var/lib/pgadmin/
     depends_on:
       - postgres
+    expose:
+      - "80"
+    environment:
+      SCRIPT_NAME: /pgadmin
+    env_file:
+      - "./backend/.env"
+    volumes:
+      - pgadmin-store:/var/lib/pgadmin/
     configs:
       - source: pgadmin-servers
         target: /pgadmin4/servers.json
         mode: 0444
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pgadmin.rule=PathPrefix(`/pgadmin`)"
+      - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    expose:
+      - "6379"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--user", "default", "off", "--user", "${REDIS_USERNAME}", "on", ">${REDIS_PASSWORD}", "allkeys", "allcommands"]
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      - RI_REDIS_HOST=redis
+      - RI_REDIS_PORT=6379
+      - RI_REDIS_USERNAME=${REDIS_USERNAME}
+      - RI_REDIS_PASSWORD=${REDIS_PASSWORD}
+      - RI_REDIS_ALIAS=simcc
+      - RI_PROXY_PATH=/redis
+    expose:
+      - "5540"
+    volumes:
+      - redisinsight-data:/data
+    depends_on:
+      - redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.redis_insight.rule=PathPrefix(`/redis`)"
+      - "traefik.http.services.redis_insight.loadbalancer.server.port=5540"
+
+  traefik:
+    image: traefik:v3.7.5
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false" 
+    ports:
+      - "7777:80"
+
 configs:
   pgadmin-servers:
     content: |
@@ -56,3 +128,6 @@ configs:
 volumes:
   postgres_data:
   pgadmin-store:
+  redis_data:
+  redisinsight-data:
+  simcc-build-data:

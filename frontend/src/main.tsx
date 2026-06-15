@@ -1,24 +1,29 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { BrowserRouter, Route, Routes } from 'react-router'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import NavLayout from './components/NavLayout'
-import Dummy from './pages/Dummy'
-import {Initialization} from "./pages/Initialization.tsx";
-import {TwoFA} from "./pages/TwoFA.tsx";
-import {Login} from "./pages/Login.tsx";
+import { Initialization } from "./pages/Initialization.tsx";
+import { TwoFA } from "./pages/TwoFA.tsx";
+import { Login } from "./pages/Login.tsx";
+import Settings from './pages/Settings.tsx'
+import Trojans from './pages/Trojans.tsx'
+import {InfectedPage} from "./pages/InfectedPage.tsx"
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter>
-        <Routes>
-            <Route element={<NavLayout />}>
-                <Route path='/dummy' element={<Dummy />} />
-            </Route>
-            <Route path= '/init' element={<Initialization/>}/>
-            <Route path= '/twofa' element={<TwoFA/>}/>
-            <Route path= '/login' element={<Login/>}/>
-        </Routes>
-    </BrowserRouter>
-  </StrictMode>,
+    <StrictMode>
+        <BrowserRouter>
+            <Routes>
+                <Route element={<NavLayout />} path='/'>
+                    <Route index element={<Navigate to="/infected" replace />} />
+                    <Route path='/infected' element={<InfectedPage />} />
+                    <Route path='/settings' element={<Settings />} />
+                    <Route path='/trojans' element={<Trojans />} />
+                </Route>
+                <Route path='/init' element={<Initialization />} />
+                <Route path='/twofa' element={<TwoFA />} />
+                <Route path='/login' element={<Login />} />
+            </Routes>
+        </BrowserRouter>
+    </StrictMode>,
 )
