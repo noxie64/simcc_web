@@ -21,4 +21,5 @@ public class InfectedDto implements Serializable {
     String osBits;
     String osArch;
     Inet4Address currentIpAddress;
+    Boolean online;
 }

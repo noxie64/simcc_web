@@ -21,4 +21,5 @@ public class InfectedWithLatestIPDto implements Serializable {
     String osBits;
     String osArch;
     String latestIpAddress;
+    Boolean online;
 }

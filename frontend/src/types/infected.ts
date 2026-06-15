@@ -6,5 +6,6 @@ export type Infected = {
     osCodeName: string,
     osBits: string,
     osArch: string,
-    latestIpAddress: string
+    latestIpAddress: string,
+    online: boolean
 }

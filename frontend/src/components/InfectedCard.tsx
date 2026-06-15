@@ -22,7 +22,11 @@ export const InfectedCard: React.FC<Props> = (props) => {
                     </p>
                     <div className={"flex items-center gap-5"}>
                         <h2 className="card-title text-lg">{props.infected.latestIpAddress}</h2>
-                        <span className={"w-3 h-3 rounded-full bg-green-500"}></span>
+                        <span className={`w-3 h-3 rounded-full ${
+                            props.infected.online
+                            ? "bg-green-500"
+                            : "bg-slate-400"
+                        }`}></span>
                     </div>
                     <p>{props.infected?.osType} {props.infected.osEdition}</p>
                     <div className="card-actions justify-start">

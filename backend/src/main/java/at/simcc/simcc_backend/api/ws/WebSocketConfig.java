@@ -1,5 +1,6 @@
 package at.simcc.simcc_backend.api.ws;
 
+import at.simcc.simcc_backend.api.sse.InfectedSSEComponent;
 import at.simcc.simcc_backend.repo.InfectedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,10 +26,11 @@ import java.util.Map;
 public class WebSocketConfig implements WebSocketConfigurer {
 
     private final InfectedRepository infectedRepository;
+    private final InfectedSSEComponent infectedSSEComponent;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebsocketHandler(infectedRepository), "/ws/infected")
+        registry.addHandler(new WebsocketHandler(infectedRepository, infectedSSEComponent), "/ws/infected")
                 .addInterceptors(new AuthInterceptor(infectedRepository))
                 .setAllowedOrigins("*");
     }

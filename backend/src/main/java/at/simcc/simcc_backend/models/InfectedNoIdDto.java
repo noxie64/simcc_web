@@ -15,4 +15,5 @@ public class InfectedNoIdDto implements Serializable {
     String osCodeName;
     String osBits;
     String osArch;
+    Boolean online;
 }

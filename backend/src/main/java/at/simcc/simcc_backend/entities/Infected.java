@@ -42,5 +42,5 @@ public class Infected {
     private List<InfectedIP> infectedIPS;
 
     @Transient
-    private boolean online;
+    private boolean online = false;
 }
