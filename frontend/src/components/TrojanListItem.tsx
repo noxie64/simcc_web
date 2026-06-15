@@ -40,7 +40,13 @@ export default function TrojanListItem(props: {
                             }}>
                                 Build
                             </button>
-                            <button className="btn btn-primary">
+                            <button className={`btn ${
+                                props.trojan.lastBuilt
+                                ? 'btn-primary'
+                                : 'btn-disabled'
+                            }`} onClick={() => {
+                                window.location.href = `/api/trojan/download/${props.trojan.ccid}`
+                            }}>
                                 Download
                             </button>
                         </>}

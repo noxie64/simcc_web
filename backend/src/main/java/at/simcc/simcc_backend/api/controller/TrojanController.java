@@ -6,28 +6,41 @@ import at.simcc.simcc_backend.api.sse.BuildCompleteEvent;
 import at.simcc.simcc_backend.api.sse.BuildFailedEvent;
 import at.simcc.simcc_backend.api.sse.BuildSSEComponent;
 import at.simcc.simcc_backend.entities.Trojan;
+import at.simcc.simcc_backend.entities.TrojanBuild;
 import at.simcc.simcc_backend.entities.User;
 import at.simcc.simcc_backend.entities.trojan_setting.TrojanSettingKey;
 import at.simcc.simcc_backend.mapper.TrojanMapper;
 import at.simcc.simcc_backend.models.TrojanDisplayDto;
-import at.simcc.simcc_backend.models.TrojanPlainDto;
+import at.simcc.simcc_backend.other.SimccSettings;
+import at.simcc.simcc_backend.repo.TrojanBuildRepository;
 import at.simcc.simcc_backend.repo.TrojanRepository;
 import at.simcc.simcc_backend.repo.UserRepository;
 import at.simcc.simcc_backend.trojan_build.TrojanBuildService;
+import io.netty.handler.codec.http.HttpContent;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Project: simcc_backend
@@ -46,6 +59,7 @@ public class TrojanController {
     private final BuildSSEComponent buildSSEComponent;
     private final TrojanRepository trojanRepo;
     private final TrojanMapper trojanMapper;
+    private final TrojanBuildRepository trojanBuildRepo;
 
     @PostMapping("/create")
     public ResponseEntity<TrojanDisplayDto> createTrojan(@Valid @RequestBody TrojanCreationRequest body, @AuthenticationPrincipal User user) {
@@ -59,6 +73,58 @@ public class TrojanController {
                         false
                 )
         );
+    }
+
+    @GetMapping("/download/{ccid}")
+    public ResponseEntity<byte[]> downloadTrojan(@PathVariable UUID ccid, HttpServletResponse response) {
+
+        Optional<TrojanBuild> trojanBuildOpt = trojanBuildRepo.findLatestBuildForTrojan(ccid);
+
+        if (trojanBuildOpt.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Trojan-build for CCID %s wasn't found!".formatted(ccid)
+            );
+        }
+
+        TrojanBuild trojanBuild = trojanBuildOpt.get();
+        String trojanName = trojanBuild.getTrojan().getName();
+
+        File buildExe = SimccSettings.BUILD_DIR.resolve("%s.exe".formatted(trojanBuild.getBuildId())).toFile();
+
+        if(!buildExe.exists()) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "File for trojan %s doesn't exist on disk!".formatted(ccid)
+            );
+        }
+
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        String fileName = "%s-%s"
+                .formatted(
+                        trojanName.replace(" ", "_"),
+                        trojanBuild.getBuildAt().format(DateTimeFormatter.ISO_DATE_TIME)
+                );
+
+        try (ZipOutputStream zout = new ZipOutputStream(bout)){
+            ZipEntry zipEntry = new ZipEntry("/%s.exe".formatted(fileName));
+
+            zout.putNextEntry(zipEntry);
+
+            Files.copy(buildExe.toPath(), zout);
+        } catch (IOException e) {
+            log.error(String.valueOf(e));
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create zip-file!");
+        }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"%s.zip\""
+                                .formatted(
+                                        fileName
+                                )
+                )
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(bout.toByteArray());
+
     }
 
     @GetMapping("/")
