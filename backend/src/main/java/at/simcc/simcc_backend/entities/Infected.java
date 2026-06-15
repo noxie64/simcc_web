@@ -2,8 +2,6 @@ package at.simcc.simcc_backend.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,4 +40,7 @@ public class Infected {
             fetch = FetchType.LAZY)
     @EqualsAndHashCode.Exclude
     private List<InfectedIP> infectedIPS;
+
+    @Transient
+    private boolean online = false;
 }

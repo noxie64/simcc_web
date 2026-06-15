@@ -20,9 +20,13 @@ export const InfectedCard: React.FC<Props> = (props) => {
                         ? <IoLogoWindows className={"w-40 h-40"} />
                         : <FaLinux className={"w-40 h-40"} />}
                     </p>
-                    <div className={"flex items-center gap-5"}>
-                        <h2 className="card-title text-lg">{props.infected.latestIpAddress}</h2>
-                        <span className={"w-3 h-3 rounded-full bg-green-500"}></span>
+                    <div className="flex items-center justify-between gap-5">
+                        <h2 className="card-title text-lg font-mono">{props.infected.latestIpAddress}</h2>
+                        {
+                            props.infected.online
+                            ? <span className="font-mono p-1 bg-green-400 rounded-md text-white">Online</span>
+                            : <span className="font-mono p-1 bg-slate-400 rounded-md text-white">Offline</span>
+                        }
                     </div>
                     <p>{props.infected?.osType} {props.infected.osEdition}</p>
                     <div className="card-actions justify-start">

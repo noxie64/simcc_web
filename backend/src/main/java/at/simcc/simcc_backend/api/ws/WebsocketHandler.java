@@ -1,11 +1,15 @@
 package at.simcc.simcc_backend.api.ws;
 
+import at.simcc.simcc_backend.api.sse.InfectedSSEComponent;
+import at.simcc.simcc_backend.api.sse.InfectedStatusChangeEvent;
 import at.simcc.simcc_backend.api.ws.payload.ERRPayload;
 import at.simcc.simcc_backend.api.ws.payload.ErrType;
 import at.simcc.simcc_backend.api.ws.payload.StringPayload;
+import at.simcc.simcc_backend.entities.Infected;
 import at.simcc.simcc_backend.repo.InfectedRepository;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -15,8 +19,9 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.io.EOFException;
 import java.io.IOException;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by: Georg Kollegger
  * Date: 4/14/26
  */
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class WebsocketHandler extends AbstractWebSocketHandler {
@@ -31,10 +37,11 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
     private final ObjectMapper objectMapper = JsonMapper.builder()
                 .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
                 .build();
-    private final Set<WebSocketSession> sessions =
+    private static final Set<WebSocketSession> sessions =
             ConcurrentHashMap.newKeySet();
 
     private final InfectedRepository infectedRepository;
+    private final InfectedSSEComponent infectedSSEComponent;
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
@@ -72,10 +79,30 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         sessions.add(session);
+        infectedSSEComponent.publish(new InfectedStatusChangeEvent(
+                (UUID) session.getAttributes().get("iid"),
+                true
+        ));
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        sessions.remove(session);
+        log.info("Closed!");
+        infectedSSEComponent.publish(new InfectedStatusChangeEvent(
+                (UUID) session.getAttributes().get("iid"),
+                false
+        ));
+    }
+
+    @Override
+    public void handleTransportError(WebSocketSession session, Throwable exception) {
+        if (exception instanceof EOFException) {
+            log.debug("Client disconnected abruptly (session {})", session.getId());
+        } else {
+            log.warn("WebSocket transport error on session {}", session.getId(), exception);
+        }
+
         sessions.remove(session);
     }
 
@@ -96,4 +123,8 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
         ));
     }
 
+    public boolean isConnected(UUID iid) {
+        return sessions.stream()
+                .anyMatch(s -> s.getAttributes().get("iid").equals(iid));
+    }
 }

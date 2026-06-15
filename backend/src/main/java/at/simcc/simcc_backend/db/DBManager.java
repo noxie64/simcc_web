@@ -41,8 +41,8 @@ public class DBManager implements ApplicationRunner {
 
     private void initDb() throws UnknownHostException {
         User user = User.builder()
-                .username("admin")
-                .email("admin@admin.com")
+                .username("test_user")
+                .email("test@test.com")
                 .password("should_be_a_hash")
                 .isAdmin(false)
                 .build();

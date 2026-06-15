@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/users/**").permitAll()
                         .requestMatchers("/trojan/**").authenticated()
-                        .requestMatchers("/infected/allInfected").authenticated()
+                        .requestMatchers("/infected/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .securityContext(context -> context.requireExplicitSave(false))

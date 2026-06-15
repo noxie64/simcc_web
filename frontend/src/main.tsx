@@ -8,7 +8,7 @@ import { TwoFA } from "./pages/TwoFA.tsx";
 import { Login } from "./pages/Login.tsx";
 import Settings from './pages/Settings.tsx'
 import Trojans from './pages/Trojans.tsx'
-import {InfectedPage} from "./pages/InfectedPage.tsx"
+import {InfectedPage} from "./pages/Infected.tsx"
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
