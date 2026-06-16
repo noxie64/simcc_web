@@ -27,7 +27,6 @@ public class SimccSettings {
 
     @Data
     public static class Docker {
-        private String host;
         private boolean tls;
     }
 

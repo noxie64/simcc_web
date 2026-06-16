@@ -28,10 +28,10 @@ public class DockerConfig {
     public DockerClient docker() {
         DefaultDockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost(
-                        (System.getProperty("os.name").toLowerCase().contains("win")
-                                ? "npipe://%s"
-                                : "unix://%s"
-                        ).formatted(simccSettings.getDocker().getHost())
+                        (System.getenv().containsKey("ON_WINDOWS")
+                                ? "tcp://host.docker.internal:2375"
+                                : "unix:///var/run/docker.sock"
+                        )
                 )
                 .withDockerTlsVerify(simccSettings.getDocker().isTls())
                 .build();
