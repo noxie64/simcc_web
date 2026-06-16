@@ -102,8 +102,14 @@ public class InfectedController {
 
     @PostMapping("/command/{iid}")
     public ResponseEntity<InfectedCommandResponse> commandInfected(@PathVariable UUID iid, @RequestBody CommandPayload command) throws IOException, ExecutionException, InterruptedException, TimeoutException {
+        CommandOutputPayload response = infectedService.sendMessage(iid, command);
+
         return ResponseEntity.ok(
-                new InfectedCommandResponse(infectedService.sendMessage(iid, command).getStdout())
+                new InfectedCommandResponse(
+                        response.getStdout(),
+                        response.getStderr(),
+                        response.getStatusCode()
+                )
         );
     }
 }

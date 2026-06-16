@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class CommandOutputPayload extends WSAwaitable {
     private String stdout;
+    private String stderr;
+    private Integer statusCode;
 
     public CommandOutputPayload(String id, String stdout) {
         super(id);
