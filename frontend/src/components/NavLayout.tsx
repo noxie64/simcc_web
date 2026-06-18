@@ -1,11 +1,21 @@
 import { useEffect, useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { Outlet, useLocation, useNavigate } from "react-router";
+import { initInfectedSSE } from "../sse";
+import { useLoginStatus } from "../hooks/useLoginStatus";
 
 export default function NavLayout() {
     const navigate = useNavigate();
     const location = useLocation();
     const [selected, setSelected] = useState<string>();
+    const { loggedIn } = useLoginStatus();
+
+    useEffect(() => {
+        console.log('Logged in:', loggedIn)
+        if (loggedIn()) {
+            return initInfectedSSE();
+        }
+    }, [loggedIn()]);
 
     const style = (name: string) => {
         // check if the current route is equal to the name we keep track off

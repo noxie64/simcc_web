@@ -2,6 +2,8 @@ import React, {useEffect, useState} from "react"
 import {useNavigate} from "react-router";
 import api from "../api/baseUrl.ts";
 import { useTitle } from "../hooks/useTitle.ts";
+import { useStore } from "../hooks/useStore.ts";
+import { useLoginStatus } from "../hooks/useLoginStatus.ts";
 
 export const Login: React.FC = () => {
     useTitle("Login");
@@ -13,6 +15,7 @@ export const Login: React.FC = () => {
      * is2FA -> variable which is used in order to know whether the website should show a 2fa screen or login screen
      * isValid -> variable that checks whether the 2fa code is right
      */
+    const { setLoggedIn } = useLoginStatus();
     const [isCredentialRight, setIsCredentialRight] = useState<boolean>();
     const [is2FA, setIs2FA] = useState<boolean>();
     const [isValid, setIsValid] = useState<boolean>();
@@ -50,7 +53,7 @@ export const Login: React.FC = () => {
             }, {withCredentials: true});
 
             if (response.data === true) {
-                localStorage.setItem("isLoggedIn", "true");
+                setLoggedIn();
                 navigate("/infected");
             } else {
                 setIsValid(false);
