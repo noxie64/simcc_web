@@ -12,6 +12,7 @@ import at.simcc.simcc_backend.repo.InfectedRepository;
 import at.simcc.simcc_backend.repo.TrojanRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.net.Inet4Address;

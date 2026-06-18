@@ -83,6 +83,16 @@ public class InfectedController {
         return ResponseEntity.ok(infectedService.getAllInfected());
     }
 
+    @GetMapping("/specificInfected")
+    public ResponseEntity<InfectedWithLatestIPDto> getSpecificInfected(@RequestParam UUID uuid){
+        InfectedWithLatestIPDto infected = infectedService.getAllInfected().stream()
+                .filter(i -> i.getIid().equals(uuid))
+                .findFirst()
+                .orElse(null);
+
+        return ResponseEntity.ok(infected);
+    }
+
     /**
      * Register a Server-Side-Event to get notified when ever the infected goes offline.
      * @param iid {@code iid} of the infected
