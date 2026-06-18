@@ -1,6 +1,12 @@
-FROM node:20-alpine AS dev
+# FROM node:20-alpine AS dev
+# WORKDIR /app
+# COPY package*.json ./
+# RUN npm ci
+# EXPOSE 5173
+# CMD ["npm", "run", "dev"]
+FROM ghcr.io/pnpm/pnpm:11 AS dev
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 EXPOSE 5173
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "dev"]

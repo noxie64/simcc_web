@@ -30,7 +30,7 @@ export const InfectedCard: React.FC<Props> = (props) => {
                     </div>
                     <p>{props.infected?.osType} {props.infected.osEdition}</p>
                     <div className="card-actions justify-start">
-                        <button className="btn btn-primary" onClick={props.command}>Command</button>
+                        <button className={`btn ${props.infected.online ? 'btn-primary' : 'btn-disabled'}`} onClick={props.command}>Command</button>
                     </div>
                 </div>
             </div>

@@ -20,7 +20,7 @@ createRoot(document.getElementById('root')!).render(
                     <Route path='/infected' element={<InfectedPage />} />
                     <Route path='/settings' element={<Settings />} />
                     <Route path='/trojans' element={<Trojans />} />
-                    <Route path='/infectedWorkspace/:id' element={<InfectedWorkSpace/>}/>
+                    <Route path='/infected/:id' element={<InfectedWorkSpace/>}/>
                 </Route>
                 <Route path='/init' element={<Initialization />} />
                 <Route path='/twofa' element={<TwoFA />} />

