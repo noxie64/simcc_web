@@ -10,11 +10,19 @@ export const EnsureLoggedIn = () => {
     const [checking, setChecking] = useState(true);
 
     useEffect(() => {
+        let cleanup: () => void;
+        let cancelled = false;
+
         const check = async () => {
             try {
                 await api.get('/users/me');
                 setLoggedIn(true);
-                initInfectedSSE();
+                const sseCleanup = initInfectedSSE();
+                if (cancelled) {
+                    sseCleanup?.();
+                } else {
+                    cleanup = sseCleanup;
+                }
             } catch (error) {
                 setLoggedIn(false);
                 navigate("/login");
@@ -24,6 +32,11 @@ export const EnsureLoggedIn = () => {
         };
 
         check();
+
+        return () => {
+            cancelled = true;
+            cleanup?.();
+        };
     }, []);
 
     if (checking) {

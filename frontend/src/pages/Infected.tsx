@@ -14,9 +14,6 @@ export const InfectedPage: React.FC = () => {
 
     useTitle("InfectedPage");
 
-    /**
-     * If the user is not authenticated, he will be redirected to /login
-     */
     const obtainAllInfectedSystems = async () => {
         if (loggedIn) {
             const response = await api.get("/infected/allInfected");
@@ -42,7 +39,7 @@ export const InfectedPage: React.FC = () => {
     useEffect(() => {
         const sseHandler = ((e: CustomEvent) => {
             const { detail: infectedStatus }: { detail: InfectedStatus } = e;
-            setInfected( prev => prev.map(infected => {
+            setInfected(prev => prev.map(infected => {
                 if (infected.iid == infectedStatus.iid) {
                     return {
                         ...infected,
