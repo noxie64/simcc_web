@@ -6,12 +6,11 @@ import { InfectedCard } from "../components/InfectedCard.tsx";
 import { useTitle } from "../hooks/useTitle.ts";
 import { useStore } from "../hooks/useStore.ts";
 import type { InfectedStatus } from "../sse.ts";
-import { useLoginStatus } from "../hooks/useLoginStatus.ts";
 
 export const InfectedPage: React.FC = () => {
     const navigate = useNavigate();
     const { infected, setInfected } = useStore();
-    const { loggedIn } = useLoginStatus();
+    const { loggedIn } = useStore();
 
     useTitle("InfectedPage");
 
@@ -19,7 +18,7 @@ export const InfectedPage: React.FC = () => {
      * If the user is not authenticated, he will be redirected to /login
      */
     const obtainAllInfectedSystems = async () => {
-        if (loggedIn()) {
+        if (loggedIn) {
             const response = await api.get("/infected/allInfected");
             setInfected(response.data as Infected[]);
             console.log(response.data)
@@ -43,7 +42,7 @@ export const InfectedPage: React.FC = () => {
     useEffect(() => {
         const sseHandler = ((e: CustomEvent) => {
             const { detail: infectedStatus }: { detail: InfectedStatus } = e;
-            setInfected(infected.map(infected => {
+            setInfected( prev => prev.map(infected => {
                 if (infected.iid == infectedStatus.iid) {
                     return {
                         ...infected,

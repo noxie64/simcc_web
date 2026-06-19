@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from "react"
-import {useNavigate} from "react-router";
+import React, { useEffect, useState } from "react"
+import { useNavigate } from "react-router";
 import api from "../api/baseUrl.ts";
 import { useTitle } from "../hooks/useTitle.ts";
 import { useStore } from "../hooks/useStore.ts";
-import { useLoginStatus } from "../hooks/useLoginStatus.ts";
 
 export const Login: React.FC = () => {
     useTitle("Login");
@@ -15,11 +14,12 @@ export const Login: React.FC = () => {
      * is2FA -> variable which is used in order to know whether the website should show a 2fa screen or login screen
      * isValid -> variable that checks whether the 2fa code is right
      */
-    const { setLoggedIn } = useLoginStatus();
+    const { setLoggedIn, loggedIn } = useStore();
     const [isCredentialRight, setIsCredentialRight] = useState<boolean>();
     const [is2FA, setIs2FA] = useState<boolean>();
     const [isValid, setIsValid] = useState<boolean>();
     const [code, setCode] = useState<string>("");
+
 
     const forgotPassword = () => {
         navigate("/");
@@ -29,16 +29,16 @@ export const Login: React.FC = () => {
      * withCredentials -> tells the browser, that it is secure to send and obtain cookies
      */
     const login = async () => {
-        try{
+        try {
             const response = await api.post("/users/login-user", {
                 email: email,
                 password: password
-            }, {withCredentials: true});
+            }, { withCredentials: true });
 
             setPassword("");
             setIsCredentialRight(response.data);
             setIs2FA(response.data);
-        }catch (error) {
+        } catch (error) {
             setPassword("");
             setIsCredentialRight(false);
             setIs2FA(false);
@@ -46,14 +46,14 @@ export const Login: React.FC = () => {
     }
 
     const verifyCode = async () => {
-        if(code.length != 0){
+        if (code.length != 0) {
             const response = await api.post("/users/verify-2fa-after-login", {
-                    email: email,
-                    code: code
-            }, {withCredentials: true});
+                email: email,
+                code: code
+            }, { withCredentials: true });
 
             if (response.data === true) {
-                setLoggedIn();
+                setLoggedIn(true);
                 navigate("/infected");
             } else {
                 setIsValid(false);
@@ -64,9 +64,9 @@ export const Login: React.FC = () => {
         }
     }
 
-    useEffect(()=>{
-        if(isValid){
-            navigate("/infected", {state : true});
+    useEffect(() => {
+        if (isValid) {
+            navigate("/infected", { state: true });
         }
     }, [isValid])
 
