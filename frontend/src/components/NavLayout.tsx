@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import { FaUser } from "react-icons/fa";
 import { Outlet, useLocation, useNavigate } from "react-router";
+import { initInfectedSSE } from "../sse";
+import { useStore } from "../hooks/useStore";
 
 export default function NavLayout() {
     const navigate = useNavigate();
     const location = useLocation();
     const [selected, setSelected] = useState<string>();
+    const { loggedIn } = useStore();
+
 
     const style = (name: string) => {
         // check if the current route is equal to the name we keep track off
@@ -44,7 +48,7 @@ export default function NavLayout() {
                     </div>
                 </div>
             </div>
-            <div className="grow flex flex-col">
+            <div className="grow flex flex-col min-h-0">
                 <Outlet />
             </div>
         </div>

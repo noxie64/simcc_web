@@ -16,4 +16,6 @@ public interface InfectedRepository extends JpaRepository<Infected, Long> {
     boolean existsInfectedByIid(UUID iid);
 
     Optional<Infected> findFirstByIid(UUID iid);
+
+    Infected findInfectedByIid(UUID iid);
 }

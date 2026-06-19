@@ -2,15 +2,13 @@ package at.simcc.simcc_backend.api.ws;
 
 import at.simcc.simcc_backend.api.sse.InfectedSSEComponent;
 import at.simcc.simcc_backend.api.sse.InfectedStatusChangeEvent;
-import at.simcc.simcc_backend.api.ws.payload.ERRPayload;
-import at.simcc.simcc_backend.api.ws.payload.ErrType;
-import at.simcc.simcc_backend.api.ws.payload.StringPayload;
-import at.simcc.simcc_backend.entities.Infected;
-import at.simcc.simcc_backend.repo.InfectedRepository;
+import at.simcc.simcc_backend.api.ws.payload.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -22,7 +20,7 @@ import tools.jackson.databind.json.JsonMapper;
 import java.io.EOFException;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 /**
  * Project: SimCC-Backend
@@ -39,37 +37,40 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
                 .build();
     private static final Set<WebSocketSession> sessions =
             ConcurrentHashMap.newKeySet();
+    private final Map<String, CompletableFuture<WSAwaitable>> pendingRequests = new ConcurrentHashMap<>();
 
-    private final InfectedRepository infectedRepository;
     private final InfectedSSEComponent infectedSSEComponent;
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
         try {
-            Message msg = objectMapper.readValue(message.getPayload(), Message.class);
+            SimccMessage msg = objectMapper.readValue(message.getPayload(), SimccMessage.class);
 
-            switch (msg.getType()) {
-                case HELLO -> {
-                    StringPayload helloPayload = objectMapper.treeToValue(msg.getPayload(), StringPayload.class);
+            if (msg.getType() == MessageType.HELLO) {
+                StringPayload helloPayload = objectMapper.treeToValue(msg.getPayload(), StringPayload.class);
 
-                    sendMessage(session,
-                            Message.builder()
-                                    .type(MessageType.GOODBYE)
-                                    .payload(
-                                            objectMapper.valueToTree(
-                                                    StringPayload.builder()
-                                                            .content("You said: %s, goodbye!".formatted(helloPayload.getContent()))
-                                                            .build()
-                                            )
-                                    )
-                                    .build()
-                    );
-                }
+                sendMessage(session,
+                        SimccMessage.builder()
+                                .type(MessageType.GOODBYE)
+                                .payload(
+                                        objectMapper.valueToTree(
+                                                StringPayload.builder()
+                                                        .content("You said: %s, goodbye!".formatted(helloPayload.getContent()))
+                                                        .build()
+                                        )
+                                )
+                                .build()
+                );
+                return;
             }
+
+            WSAwaitable wsAwaitable = (WSAwaitable) objectMapper.treeToValue(msg.getPayload(), msg.getType().getType());
+            pendingRequests.get(wsAwaitable.getId()).complete(wsAwaitable);
         } catch (JacksonException e) {
             sendError(
                     session,
                     ERRPayload.builder()
+                            .msg(e.getMessage())
                             .type(ErrType.INV_REQ)
                             .build()
             );
@@ -106,14 +107,46 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
         sessions.remove(session);
     }
 
-    private void sendMessage(WebSocketSession session, Message message) throws IOException {
+    private void sendMessage(WebSocketSession session, SimccMessage message) throws IOException {
         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
+    }
+
+    private WSAwaitable sendMessageAndWait(WebSocketSession session, SimccMessage message) throws IOException, ExecutionException, InterruptedException, TimeoutException {
+        String id = UUID.randomUUID().toString();
+        CompletableFuture<WSAwaitable> future = new CompletableFuture<>();
+
+        pendingRequests.put(id, future);
+
+
+        // inject id
+        WSAwaitable awaitable = (WSAwaitable) objectMapper.treeToValue(message.getPayload(), message.getType().getType());
+        awaitable.setId(id);
+
+        message.setPayload(objectMapper.valueToTree(awaitable));
+
+        sendMessage(session, message);
+
+        try {
+            return future.get(30, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            pendingRequests.remove(id);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No response from infected client!");
+        }
+    }
+
+    public WSAwaitable sendMessageToInfectedAndWait(UUID iid, SimccMessage message) throws IOException, ExecutionException, InterruptedException, TimeoutException {
+        WebSocketSession session = sessions.stream()
+                .filter(s -> s.getAttributes().get("iid").equals(iid))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Infected %s not found!".formatted(iid)));
+
+        return sendMessageAndWait(session, message);
     }
 
     private void sendError(WebSocketSession session, ERRPayload errPayload) throws IOException {
         session.sendMessage(new TextMessage(
                 objectMapper.writeValueAsString(
-                        Message.builder()
+                        SimccMessage.builder()
                                 .type(MessageType.ERR)
                                 .payload(
                                         objectMapper.valueToTree(errPayload)

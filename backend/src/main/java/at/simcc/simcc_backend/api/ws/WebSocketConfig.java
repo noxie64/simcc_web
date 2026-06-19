@@ -26,11 +26,11 @@ import java.util.Map;
 public class WebSocketConfig implements WebSocketConfigurer {
 
     private final InfectedRepository infectedRepository;
-    private final InfectedSSEComponent infectedSSEComponent;
+    private final WebsocketHandler websocketHandler;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebsocketHandler(infectedRepository, infectedSSEComponent), "/ws/infected")
+        registry.addHandler(websocketHandler, "/ws/infected")
                 .addInterceptors(new AuthInterceptor(infectedRepository))
                 .setAllowedOrigins("*");
     }

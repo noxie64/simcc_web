@@ -1,5 +1,6 @@
 package at.simcc.simcc_backend.api.controller;
 
+import at.simcc.simcc_backend.api.body.LoginStatusResponse;
 import at.simcc.simcc_backend.api.service.UserService;
 import at.simcc.simcc_backend.entities.User;
 import at.simcc.simcc_backend.models.UserDto;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
@@ -136,4 +138,12 @@ public class UserController {
         }
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<LoginStatusResponse> loginStatus(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(new LoginStatusResponse(true));
+    }
 }

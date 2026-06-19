@@ -15,7 +15,7 @@ import tools.jackson.databind.JsonNode;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Message {
+public class SimccMessage {
     private MessageType type;
     private JsonNode payload;
 }

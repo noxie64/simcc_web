@@ -1,5 +1,6 @@
 package at.simcc.simcc_backend.api.service;
 
+import at.simcc.simcc_backend.api.body.LoginStatusResponse;
 import at.simcc.simcc_backend.entities.User;
 import at.simcc.simcc_backend.mapper.UserLoginDtoMapper;
 import at.simcc.simcc_backend.models.UserLoginDto;
@@ -16,6 +17,7 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

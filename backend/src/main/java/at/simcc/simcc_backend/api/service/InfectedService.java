@@ -1,7 +1,11 @@
 package at.simcc.simcc_backend.api.service;
 
 import at.simcc.simcc_backend.api.body.InfectedRegistrationRequest;
+import at.simcc.simcc_backend.api.ws.SimccMessage;
+import at.simcc.simcc_backend.api.ws.MessageType;
 import at.simcc.simcc_backend.api.ws.WebsocketHandler;
+import at.simcc.simcc_backend.api.ws.payload.CommandOutputPayload;
+import at.simcc.simcc_backend.api.ws.payload.CommandPayload;
 import at.simcc.simcc_backend.entities.Infected;
 import at.simcc.simcc_backend.entities.InfectedIP;
 import at.simcc.simcc_backend.entities.Trojan;
@@ -12,11 +16,16 @@ import at.simcc.simcc_backend.repo.InfectedRepository;
 import at.simcc.simcc_backend.repo.TrojanRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Project: SimCC-Backend
@@ -32,6 +41,7 @@ public class InfectedService {
 
     private final InfectedMapper infectedMapper;
     private final WebsocketHandler websocketHandler;
+    private final ObjectMapper objectMapper;
 
     /**
      * Register a new infected machine using a {@code ccid}
@@ -99,5 +109,16 @@ public class InfectedService {
         }
 
         return infectedDtos;
+    }
+
+    public CommandOutputPayload sendMessage(UUID iid, CommandPayload command) throws IOException, ExecutionException, InterruptedException, TimeoutException {
+        return (CommandOutputPayload) websocketHandler.sendMessageToInfectedAndWait(iid,
+                SimccMessage.builder()
+                        .type(MessageType.COMMAND)
+                        .payload(
+                                objectMapper.valueToTree(
+                                        command
+                                )
+                        ).build());
     }
 }
