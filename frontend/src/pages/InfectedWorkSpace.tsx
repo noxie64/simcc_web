@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { Fragment, useEffect, useRef, useState } from "react"
 import { useNavigate, useParams } from "react-router";
 import type { Infected } from "../types/infected.ts";
 import api from "../api/baseUrl.ts";
@@ -26,6 +26,8 @@ export const InfectedWorkSpace: React.FC = () => {
     const [page, setPage] = useState<'command' | 'screenshot'>('command');
     const [commandResults, setCommandResults] = useState<CommandResult[]>([]);
     const [input, setInput] = useState<string>("");
+    const scrollable = useRef<HTMLDivElement>(null);
+
     useTitle("Infected Work Space");
 
     useEffect(() => {
@@ -35,6 +37,15 @@ export const InfectedWorkSpace: React.FC = () => {
 
         setInfected(findByIID(iid!));
     }, []);
+
+    useEffect(() => {
+        if (scrollable.current) {
+            scrollable.current.scrollTo({
+                top: scrollable.current.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    }, [commandResults]);
 
     useEffect(() => {
         const sseHandler = ((e: CustomEvent) => {
@@ -98,10 +109,11 @@ export const InfectedWorkSpace: React.FC = () => {
                     page === 'command' &&
                     <div className="flex flex-col grow min-h-0 overflow-auto">
                         <div className="flex-1 min-h-0 bg-gray-900 rounded-t-xl p-4 shadow-inner overflow-auto">
-                            <div className="h-full overflow-y-auto pr-2 space-y-2 flex flex-col overflow-auto">
+                            <div ref={scrollable} className="h-full overflow-y-auto pr-2 space-y-2 flex flex-col overflow-auto">
 
                                 {commandResults.map(({ input: cmdInput, output }, i) => {
                                     let styleBase = "whitespace-pre-wrap text-lg font-medium font-mono w-full ";
+
                                     return (
                                         <Fragment key={i}>
                                             <p className={styleBase + "text-white"}>$ {cmdInput}</p>
