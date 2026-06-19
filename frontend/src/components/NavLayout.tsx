@@ -48,7 +48,7 @@ export default function NavLayout() {
                     </div>
                 </div>
             </div>
-            <div className="grow flex flex-col">
+            <div className="grow flex flex-col min-h-0">
                 <Outlet />
             </div>
         </div>

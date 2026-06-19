@@ -96,9 +96,10 @@ export const InfectedWorkSpace: React.FC = () => {
                 </div>
                 {
                     page === 'command' &&
-                    <div className="flex flex-col grow h-full min-h-0">
-                        <div className="flex-1 min-h-0 bg-gray-900 rounded-t-xl p-4 shadow-inner overflow-hidden">
-                            <div className="h-full overflow-y-auto pr-2 space-y-2 flex flex-col justify-end">
+                    <div className="flex flex-col grow min-h-0 overflow-auto">
+                        <div className="flex-1 min-h-0 bg-gray-900 rounded-t-xl p-4 shadow-inner overflow-auto">
+                            <div className="h-full overflow-y-auto pr-2 space-y-2 flex flex-col overflow-auto">
+
                                 {commandResults.map(({ input: cmdInput, output }, i) => {
                                     let styleBase = "whitespace-pre-wrap text-lg font-medium font-mono w-full ";
                                     return (
