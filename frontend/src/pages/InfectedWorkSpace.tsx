@@ -6,6 +6,7 @@ import { useTitle } from "../hooks/useTitle.ts";
 import { useStore } from "../hooks/useStore.ts";
 import type { InfectedStatus } from "../sse.ts";
 import { IoIosArrowBack } from "react-icons/io";
+import { FaImages, FaRegImages } from "react-icons/fa";
 
 interface Output {
     stdout: string,
@@ -154,8 +155,17 @@ export const InfectedWorkSpace: React.FC = () => {
                 }
                 {
                     page === 'screenshot' &&
-                    <div>
-                        <h1>Coming soon!</h1>
+                    <div className="grow flex flex-col justify-center items-center gap-4">
+                        <div className="grow bg-slate-200 w-full border border-slate-400 border-1 rounded-md flex flex-col justify-center items-center text-slate-400">
+                            <FaRegImages className="text-9xl" />
+                            <div className="flex flex-row gap-2">
+                                <p className="italic">
+                                    Requesting image
+                                </p>
+                                <span className="loading loading-spinner"></span>
+                            </div>
+                        </div>
+                        <button className="btn bg-red-500 ring-2 ring-red-500 ring-offset-3 ring-offset-white rounded-full w-10 hover:bg-red-600 hover:ring-red-600" />
                     </div>
                 }
             </div>
