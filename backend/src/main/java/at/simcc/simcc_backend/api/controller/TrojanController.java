@@ -101,7 +101,7 @@ public class TrojanController {
         String fileName = "%s-%s"
                 .formatted(
                         trojanName.replace(" ", "_"),
-                        trojanBuild.getBuildAt().format(DateTimeFormatter.ISO_DATE_TIME)
+                        trojanBuild.getBuildId()
                 );
 
         try (ZipOutputStream zout = new ZipOutputStream(bout)){
