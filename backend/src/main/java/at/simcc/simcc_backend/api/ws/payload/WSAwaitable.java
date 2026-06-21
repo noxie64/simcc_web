@@ -3,6 +3,7 @@ package at.simcc.simcc_backend.api.ws.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 /**
  * Project: backend
@@ -11,6 +12,7 @@ import lombok.Getter;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class WSAwaitable {
     private String id;
 }

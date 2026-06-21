@@ -13,8 +13,10 @@ public class CommandOutputPayload extends WSAwaitable {
     private String stderr;
     private Integer statusCode;
 
-    public CommandOutputPayload(String id, String stdout) {
+    public CommandOutputPayload(String id, String stdout, String stderr, Integer statusCode) {
         super(id);
         this.stdout = stdout;
+        this.stderr = stderr;
+        this.statusCode = statusCode;
     }
 }
