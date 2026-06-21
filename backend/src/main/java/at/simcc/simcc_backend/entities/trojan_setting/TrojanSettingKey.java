@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public enum TrojanSettingKey {
 
     HOST {
-        private static final Pattern HOST_PATTERN = java.util.regex.Pattern.compile("^\\w*(:\\d{1,5})?$");
+        private static final Pattern HOST_PATTERN = java.util.regex.Pattern.compile("^(\\w|\\.)*(:\\d{1,5})?$");
         @Override
         public boolean validate(Object value) {
             if (value.getClass() != String.class) return false;

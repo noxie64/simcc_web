@@ -105,7 +105,7 @@ public class TrojanController {
                 );
 
         try (ZipOutputStream zout = new ZipOutputStream(bout)){
-            ZipEntry zipEntry = new ZipEntry("/%s.exe".formatted(fileName));
+            ZipEntry zipEntry = new ZipEntry("%s.exe".formatted(fileName));
 
             zout.putNextEntry(zipEntry);
 

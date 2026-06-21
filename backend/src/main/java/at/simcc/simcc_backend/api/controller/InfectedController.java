@@ -133,7 +133,7 @@ public class InfectedController {
 
         return ResponseEntity.ok(
                 new ScreenshotResponse(
-                        "/screenshot/view/%s.jpg"
+                        "/infected/screenshot/view/%s.jpg"
                                 .formatted(screenshotID)
                 )
         );
