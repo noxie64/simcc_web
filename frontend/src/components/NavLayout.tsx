@@ -35,9 +35,6 @@ export default function NavLayout() {
                     <h3 className={`font-medium cursor-pointer ${style("infected")}`}
                         onClick={() => navigate("/infected")}
                     >Infected</h3>
-                    <h3 className={`font-medium cursor-pointer  ${style("settings")}`}
-                        onClick={() => navigate("/settings")}
-                    >Settings</h3>
                     <h3 className={`font-medium cursor-pointer  ${style("trojans")}`}
                         onClick={() => navigate("/trojans")}
                     >Trojans</h3>

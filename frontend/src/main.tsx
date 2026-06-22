@@ -6,7 +6,6 @@ import NavLayout from './components/NavLayout'
 import { Initialization } from "./pages/Initialization.tsx";
 import { TwoFA } from "./pages/TwoFA.tsx";
 import { Login } from "./pages/Login.tsx";
-import Settings from './pages/Settings.tsx'
 import Trojans from './pages/Trojans.tsx'
 import { InfectedPage } from "./pages/Infected.tsx"
 import { EnsureLoggedIn } from './components/EnsureLoggedIn.tsx'
@@ -20,7 +19,6 @@ createRoot(document.getElementById('root')!).render(
                     <Route element={<NavLayout />} path='/'>
                         <Route index element={<Navigate to="/infected" replace />} />
                         <Route path='/infected' element={<InfectedPage />} />
-                        <Route path='/settings' element={<Settings />} />
                         <Route path='/trojans' element={<Trojans />} />
                         <Route path='/infected/:iid' element={<InfectedControlRoom />} />
                     </Route>
