@@ -98,8 +98,8 @@ export const InfectedControlRoom: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col h-full">
-            <div className="flex w-full items-center justify-start gap-5 p-4">
+        <div className="flex flex-col h-full min-h-0">
+            <div className="flex w-full items-center justify-start gap-5 p-4 min-h-0">
                 <button className="btn btn-ghost rounded-full" onClick={() => navigate('/infected')}>
                     <IoIosArrowBack />
                 </button>
@@ -168,7 +168,7 @@ export const InfectedControlRoom: React.FC = () => {
                 }
                 {
                     page === 'screenshot' &&
-                    <div className="grow flex flex-col justify-center items-center gap-4">
+                    <div className="grow flex flex-col justify-center items-center gap-4 min-h-0">
                         {
                             screenshotUrl == ''
                                 ? <div className="grow bg-slate-200 w-full border border-slate-400 border-1 rounded-md flex flex-col justify-center items-center text-slate-400">
@@ -182,7 +182,9 @@ export const InfectedControlRoom: React.FC = () => {
                                         </div>
                                     }
                                 </div>
-                                : <img src={screenshotUrl} />
+                                : <div className="relative grow w-full min-h-0">
+                                    <img src={screenshotUrl} className="absolute inset-0 w-full h-full object-contain" />
+                                </div>
                         }
                         <button className="btn bg-red-500 ring-2 ring-red-500 ring-offset-3 ring-offset-white rounded-full w-10 hover:bg-red-600 hover:ring-red-600" onClick={handleRequestScreenshot} />
                     </div>
