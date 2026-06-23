@@ -39,8 +39,11 @@ export const InfectedPage: React.FC = () => {
     useEffect(() => {
         const sseHandler = ((e: CustomEvent) => {
             const { detail: infectedStatus }: { detail: InfectedStatus } = e;
+            let exists = false;
+
             setInfected(prev => prev.map(infected => {
                 if (infected.iid == infectedStatus.iid) {
+                    exists = true;
                     return {
                         ...infected,
                         online: infectedStatus.online
@@ -49,6 +52,10 @@ export const InfectedPage: React.FC = () => {
 
                 return infected;
             }))
+
+            if (!exists) {
+                obtainAllInfectedSystems();
+            }
             console.log("Status updated:", infectedStatus);
         }) as EventListener;
 

